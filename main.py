@@ -1,4 +1,7 @@
 from __future__ import division
+import os
+import os.path
+import gdxpds
 import math
 import json
 import numpy as np
@@ -30,10 +33,137 @@ C_NORM = "#31AADE"
 CHARTTYPES = ['Dot', 'Line', 'Bar', 'Area']
 AGGREGATIONS = ['None', 'Sum']
 
+
+def scale_column(datafrm, **kw):
+    datafrm[kw['column']] = datafrm[kw['column']] * kw['scale_factor']
+    return datafrm
+
+def scale_column_filtered(datafrm, **kw):
+    cond = datafrm[kw['by_column']].isin(kw['by_vals'])
+    datafrm.loc[cond, kw['change_column']] = datafrm.loc[cond, kw['change_column']] * kw['scale_factor']
+    return datafrm
+
+results_meta = collections.OrderedDict((
+    ('Capacity (GW)',
+        {'file': 'CONVqn.gdx',
+        'param': 'CONVqnallyears',
+        'columns': ['tech', 'n', 'year', 'Capacity (GW)'],
+        'default_xaxis': 'year',
+        'default_series': 'tech',
+        'default_yaxis': 'Capacity (GW)',
+        'default_aggregation': 'sum',
+        'preprocess': [
+            {'func': scale_column, 'args': {'scale_factor': .001, 'column': 'Capacity (GW)'}},
+            {'func': scale_column_filtered, 'args': {'by_column': 'tech', 'by_vals': ['UPV', 'DUPV', 'distPV'], 'change_column': 'Capacity (GW)', 'scale_factor': 1/1.1}},
+        ],
+        'unit': 'GW',
+        'default_chart_type': 'stacked_area',
+        }
+    ),
+    # ('CO2 (Million Tonnes)',
+    #     {'file': 'Reporting.gdx',
+    #     'param': 'AnnualReport',
+    #     'columns': ['n', 'year', 'pollu_type', 'value'],
+    #     'default_xaxis': 'year',
+    #     'default_series': 'pollu_type',
+    #     'default_yaxis': 'value',
+    #     'default_aggregation': 'none',
+    #     'tranform': multiply(0.000001),
+    #     'unit': 'Million tonnes',
+    #     'default_chart_type': 'line',
+    #     'combined_default_chart_type': 'line',
+    #     'combined_default_aggregation': 'none'}),
+))
+
+
+# columns_meta = {
+#     'tech':{
+#         'type': 'string',
+#         'filter': 'multiple',
+#         'full_set': techs_full,
+#         'colors': display_techs_colors,
+#         'options': ['series'],
+#         'merge': tech_map,
+#         'colors': tech_colors,
+#     },
+#     'n':{
+#         'type': 'string',
+#         'filter': 'single',
+#         'full_set': pcas_full,
+#         'options': [],
+#         'merge': hierarchy,
+#         'colors': tech_colors,
+#     },
+#     'year':{
+#         'type': 'number',
+#         'filter': 'multiple',
+#         'full_set': years_full,
+#         'options': ['xaxis'],
+#     },
+#     'value':{
+#         'type': 'number',
+#         'colors': pca_colors,
+#         'options': ['yaxis'],
+#     },
+#     'pollu_type':{
+#         'type': 'string',
+#         'filter': 'single',
+#         'options': ['series'],
+#     },
+# }
+
+
+def set_runs_wdg(data_file):
+    topwdg.clear()
+    topwdg['runs'] = bmw.TextInput(title='Run(s)', value=data_file)
+    topwdg['runs'].on_change('value', update_runs)
+
+def get_scenarios():
+    if topwdg['runs'].value != '':
+        scenarios[:] = []
+        runs_path = topwdg['runs'].value
+        if os.path.isdir(runs_path):
+            abs_path = str(os.path.abspath(runs_path))
+            if os.path.isdir(abs_path+'/gdxfiles'):
+                scenarios.append({'name': os.path.basename(abs_path), 'path': abs_path})
+            else:
+                subdirs = os.walk(abs_path).next()[1]
+                for subdir in subdirs:
+                    if os.path.isdir(abs_path+'/'+subdir+'/gdxfiles'):
+                        abs_subdir = str(os.path.abspath(abs_path+'/'+subdir))
+                        scenarios.append({'name': subdir, 'path': abs_subdir})
+            if scenarios is not []:
+                labels = [a['name'] for a in scenarios]
+                topwdg['filter_scenarios'] = bmw.CheckboxGroup(labels=labels, active=list(range(len(labels))))
+                topwdg['filter_scenarios'].on_change('active', update_data)
+                topwdg['result'] = bmw.Select(title='Result', value='None', options=['None']+list(results_meta.keys()))
+                topwdg['result'].on_change('value', update_data)
+        controls.children = list(topwdg.values())
+
+
 def get_data():
     global df, columns, discrete, continuous, filterable, seriesable
-    data_source = wdg['data'].value
-    df = pd.read_csv(data_source)
+    result = topwdg['result'].value
+    if result not in result_dfs:
+            result_dfs[result] = None
+            cur_scenarios = []
+    else:
+        cur_scenarios = result_dfs[result]['scenario'].unique().tolist()
+    for i in topwdg['filter_scenarios'].active:
+        scenario_name = scenarios[i]['name']
+        if scenario_name not in cur_scenarios:
+            result_meta = results_meta[result]
+            #get the gdx result and preprocess
+            df_scen_result = gdxpds.to_dataframe(scenarios[i]['path'] + '\\gdxfiles\\' + result_meta['file'], result_meta['param'])[result_meta['param']]
+            df_scen_result.columns = result_meta['columns']
+            for preprocess in result_meta['preprocess']:
+                df_scen_result = preprocess['func'](df_scen_result, **preprocess['args'])
+            df_scen_result['scenario'] = scenario_name
+            if result_dfs[result] is None:
+                result_dfs[result] = df_scen_result
+            else:
+                result_dfs[result] = pd.concat([result_dfs[result], df_scen_result]).reset_index(drop=True)
+    df = result_dfs[result]
     columns = sorted(df.columns)
     discrete = [x for x in columns if df[x].dtype == object]
     continuous = [x for x in columns if x not in discrete]
@@ -44,10 +174,8 @@ def get_data():
 
 def build_widgets():
     global init_load
-    data_source = wdg['data'].value
     wdg.clear()
 
-    wdg['data'] = bmw.TextInput(title='Data Source (required)', value=data_source, css_classes=['wdgkey-data'])
     wdg['x_dropdown'] = bmw.Div(text='X-Axis (required)', css_classes=['x-dropdown'])
     wdg['x'] = bmw.Select(title='X-Axis (required)', value='None', options=['None'] + columns, css_classes=['wdgkey-x', 'x-drop'])
     wdg['x_group'] = bmw.Select(title='Group X-Axis By', value='None', options=['None'] + seriesable, css_classes=['wdgkey-x_group', 'x-drop'])
@@ -105,7 +233,6 @@ def build_widgets():
                     wdg[key].active = wdg_config[key]
         init_load = False
 
-    wdg['data'].on_change('value', update_data)
     wdg['chart_type'].on_change('value', update_sel)
     wdg['x'].on_change('value', update_sel)
     wdg['x_group'].on_change('value', update_sel)
@@ -139,7 +266,7 @@ def build_widgets():
     wdg['update'].on_click(update_plots)
     wdg['download'].on_click(download)
 
-    controls.children = list(wdg.values())
+    controls.children = list(topwdg.values()) + list(wdg.values())
 
 def set_df_plots():
     global df_plots
@@ -328,10 +455,15 @@ def build_series_legend():
     wdg['series_legend'].text =  series_legend_string
 
 
+def update_runs(attr, old, new):
+    set_runs_wdg(topwdg['runs'].value)
+    get_scenarios()
+
 def update_data(attr, old, new):
-    get_data()
-    build_widgets()
-    update_plots()
+    if topwdg['result'].value is not 'None':
+        get_data()
+        build_widgets()
+        update_plots()
 
 def update_sel(attr, old, new):
     update_plots()
@@ -351,7 +483,9 @@ def download():
 #and widget configuration object (wdg_config)
 init_load = True
 wdg_config = {}
-data_file = 'csv/power.csv'
+scenarios = []
+result_dfs = {}
+data_file = ''
 args = bio.curdoc().session_context.request.arguments
 wdg_arr = args.get('widgets')
 if wdg_arr is not None:
@@ -361,12 +495,14 @@ if wdg_arr is not None:
 
 #build widgets and plots
 wdg = collections.OrderedDict()
-wdg['data'] = bmw.TextInput(title='Data Source', value=data_file)
-get_data()
-controls = bl.widgetbox([], id='widgets_section')
-build_widgets()
+topwdg = collections.OrderedDict()
+fullwdg = collections.OrderedDict()
+set_runs_wdg(data_file)
+get_scenarios()
+controls = bl.widgetbox(list(topwdg.values()), id='widgets_section')
+# build_widgets()
 plots = bl.column([], id='plots_section')
-update_plots()
+# update_plots()
 layout = bl.row(controls, plots, id='layout')
 
 bio.curdoc().add_root(layout)
