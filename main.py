@@ -115,7 +115,8 @@ results_meta = collections.OrderedDict((
 
 def set_runs_wdg(data_file):
     topwdg.clear()
-    topwdg['runs'] = bmw.TextInput(title='Run(s)', value=data_file)
+    topwdg['runs'] = bmw.TextInput(title='Run(s)', value=data_file, css_classes=['wdgkey-runs'])
+    if init_load and 'runs' in wdg_config: topwdg['runs'].value = str(wdg_config['runs'])
     topwdg['runs'].on_change('value', update_runs)
 
 def get_scenarios():
@@ -134,12 +135,13 @@ def get_scenarios():
                         scenarios.append({'name': subdir, 'path': abs_subdir})
             if scenarios is not []:
                 labels = [a['name'] for a in scenarios]
-                topwdg['filter_scenarios'] = bmw.CheckboxGroup(labels=labels, active=list(range(len(labels))))
-                topwdg['filter_scenarios'].on_change('active', update_data)
-                topwdg['result'] = bmw.Select(title='Result', value='None', options=['None']+list(results_meta.keys()))
+                topwdg['filter_scenarios_dropdown'] = bmw.Div(text='Filter Scenarios', css_classes=['filter-scenarios-dropdown'])
+                topwdg['filter_scenarios'] = bmw.CheckboxGroup(labels=labels, active=list(range(len(labels))), css_classes=['wdgkey-filter_scenarios'])
+                if init_load and 'filter_scenarios' in wdg_config: topwdg['filter_scenarios'].active = wdg_config['filter_scenarios']
+                topwdg['result'] = bmw.Select(title='Result', value='None', options=['None']+list(results_meta.keys()), css_classes=['wdgkey-result'])
+                if init_load and 'result' in wdg_config: topwdg['result'].value = str(wdg_config['result'])
                 topwdg['result'].on_change('value', update_data)
         controls.children = list(topwdg.values())
-
 
 def get_data():
     global df, columns, discrete, continuous, filterable, seriesable
@@ -460,7 +462,10 @@ def update_runs(attr, old, new):
     get_scenarios()
 
 def update_data(attr, old, new):
-    if topwdg['result'].value is not 'None':
+    get_data_and_build()
+
+def get_data_and_build():
+    if 'result' in topwdg and topwdg['result'].value is not 'None':
         get_data()
         build_widgets()
         update_plots()
@@ -496,13 +501,11 @@ if wdg_arr is not None:
 #build widgets and plots
 wdg = collections.OrderedDict()
 topwdg = collections.OrderedDict()
-fullwdg = collections.OrderedDict()
 set_runs_wdg(data_file)
-get_scenarios()
 controls = bl.widgetbox(list(topwdg.values()), id='widgets_section')
-# build_widgets()
 plots = bl.column([], id='plots_section')
-# update_plots()
+get_scenarios()
+get_data_and_build()
 layout = bl.row(controls, plots, id='layout')
 
 bio.curdoc().add_root(layout)

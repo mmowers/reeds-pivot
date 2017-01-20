@@ -34,7 +34,8 @@ body {
 .explode-drop,
 .filter,
 .filters-update,
-.adjust-drop{
+.adjust-drop,
+.wdgkey-filter_scenarios{
     display: none;
 }
 .filter-head{
@@ -48,7 +49,8 @@ body {
 .series-dropdown,
 .explode-dropdown,
 .filters-dropdown,
-.adjust-dropdown{
+.adjust-dropdown,
+.filter-scenarios-dropdown{
     font-weight: bold;
     color: blue;
     cursor: pointer;

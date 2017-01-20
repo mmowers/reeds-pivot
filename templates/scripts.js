@@ -1,4 +1,7 @@
 $(document).ready(function(){
+    $('body').on('click', '.filter-scenarios-dropdown', function(){
+        $('.wdgkey-filter_scenarios').toggle();
+    });
     $('body').on('click', '.x-dropdown', function(){
         $('.x-drop').toggle();
     });
@@ -18,12 +21,14 @@ $(document).ready(function(){
         $('.select-all-none').hide();
         $('.filter').hide();
     });
-    $('body').on('click', '.filter-head', function(){
+    $('body').on('click', '.filter-head, .filter-scenarios-dropdown', function(){
         if($(this).next('.select-all-none').length == 0){
             $(this).after('<div class="select-all-none"><span class="select-all select-opt">All</span>|<span class="select-none select-opt">None</span>');
         }else{
             $(this).next(".select-all-none").toggle();
         }
+    });
+    $('body').on('click', '.filter-head', function(){
         $(this).next(".select-all-none").next(".filter").toggle();
     });
     $('body').on('click', '.adjust-dropdown', function(){
@@ -46,7 +51,7 @@ $(document).ready(function(){
             var selected_val = $(this).val();
             wdg_obj[wdg_name] = selected_val;
         });
-        $('.filter').each(function(){
+        $('.filter, .wdgkey-filter_scenarios').each(function(){
             var wdg_name = $(this).attr('class').match(/wdgkey-([^ ]*)/)[1];
             wdg_obj[wdg_name] = []
             $(this).find('input').each(function(){
@@ -56,6 +61,6 @@ $(document).ready(function(){
             });
         });
         var widgets_string = encodeURIComponent(JSON.stringify(wdg_obj));
-        window.history.pushState({}, "", "superpivot?widgets=" + widgets_string);
+        window.history.pushState({}, "", "reeds-pivot?widgets=" + widgets_string);
     });
 });
