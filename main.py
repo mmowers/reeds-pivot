@@ -123,7 +123,15 @@ def get_scenarios():
     if topwdg['runs'].value != '':
         scenarios[:] = []
         runs_path = topwdg['runs'].value
-        if os.path.isdir(runs_path):
+        if os.path.isfile(runs_path) and runs_path.lower().endswith('.csv'):
+            abs_path = str(os.path.abspath(runs_path))
+            df_scen = pd.read_csv(abs_path)
+            for i_scen, scen in df_scen.iterrows():
+                if os.path.isdir(scen['path']):
+                    abs_path_scen = os.path.abspath(scen['path'])
+                    if os.path.isdir(abs_path_scen+'/gdxfiles'):
+                        scenarios.append({'name': scen['name'], 'path': abs_path_scen})
+        elif os.path.isdir(runs_path):
             abs_path = str(os.path.abspath(runs_path))
             if os.path.isdir(abs_path+'/gdxfiles'):
                 scenarios.append({'name': os.path.basename(abs_path), 'path': abs_path})
@@ -133,14 +141,14 @@ def get_scenarios():
                     if os.path.isdir(abs_path+'/'+subdir+'/gdxfiles'):
                         abs_subdir = str(os.path.abspath(abs_path+'/'+subdir))
                         scenarios.append({'name': subdir, 'path': abs_subdir})
-            if scenarios is not []:
-                labels = [a['name'] for a in scenarios]
-                topwdg['filter_scenarios_dropdown'] = bmw.Div(text='Filter Scenarios', css_classes=['filter-scenarios-dropdown'])
-                topwdg['filter_scenarios'] = bmw.CheckboxGroup(labels=labels, active=list(range(len(labels))), css_classes=['wdgkey-filter_scenarios'])
-                if init_load and 'filter_scenarios' in wdg_config: topwdg['filter_scenarios'].active = wdg_config['filter_scenarios']
-                topwdg['result'] = bmw.Select(title='Result', value='None', options=['None']+list(results_meta.keys()), css_classes=['wdgkey-result'])
-                if init_load and 'result' in wdg_config: topwdg['result'].value = str(wdg_config['result'])
-                topwdg['result'].on_change('value', update_data)
+        if scenarios is not []:
+            labels = [a['name'] for a in scenarios]
+            topwdg['filter_scenarios_dropdown'] = bmw.Div(text='Filter Scenarios', css_classes=['filter-scenarios-dropdown'])
+            topwdg['filter_scenarios'] = bmw.CheckboxGroup(labels=labels, active=list(range(len(labels))), css_classes=['wdgkey-filter_scenarios'])
+            if init_load and 'filter_scenarios' in wdg_config: topwdg['filter_scenarios'].active = wdg_config['filter_scenarios']
+            topwdg['result'] = bmw.Select(title='Result', value='None', options=['None']+list(results_meta.keys()), css_classes=['wdgkey-result'])
+            if init_load and 'result' in wdg_config: topwdg['result'].value = str(wdg_config['result'])
+            topwdg['result'].on_change('value', update_data)
         controls.children = list(topwdg.values())
 
 def get_data():
