@@ -76,7 +76,7 @@ results_meta = collections.OrderedDict((
 ))
 
 
-# columns_meta = {
+columns_meta = {
 #     'tech':{
 #         'type': 'string',
 #         'filter': 'multiple',
@@ -94,12 +94,9 @@ results_meta = collections.OrderedDict((
 #         'merge': hierarchy,
 #         'colors': tech_colors,
 #     },
-#     'year':{
-#         'type': 'number',
-#         'filter': 'multiple',
-#         'full_set': years_full,
-#         'options': ['xaxis'],
-#     },
+    'year':{
+        'type': 'number',
+    },
 #     'value':{
 #         'type': 'number',
 #         'colors': pca_colors,
@@ -110,7 +107,7 @@ results_meta = collections.OrderedDict((
 #         'filter': 'single',
 #         'options': ['series'],
 #     },
-# }
+}
 
 
 def set_runs_wdg(data_file):
@@ -167,7 +164,7 @@ def get_data():
     else:
         cur_scenarios = result_dfs[result]['scenario'].unique().tolist() #the scenarios that have already been retrieved and stored in result_dfs
     #For each selected scenario, retrieve the data from gdx if we don't already have it,
-    #and update result_dfs
+    #and update result_dfs with the new data.
     for i in topwdg['filter_scenarios'].active:
         scenario_name = scenarios[i]['name']
         if scenario_name not in cur_scenarios:
@@ -182,8 +179,12 @@ def get_data():
                 result_dfs[result] = df_scen_result
             else:
                 result_dfs[result] = pd.concat([result_dfs[result], df_scen_result]).reset_index(drop=True)
+
     df = result_dfs[result]
     columns = sorted(df.columns)
+    for c in columns:
+        if c in columns_meta and columns_meta[c]['type'] is 'number':
+            df[c] = pd.to_numeric(df[c], errors='coerce')
     discrete = [x for x in columns if df[x].dtype == object]
     continuous = [x for x in columns if x not in discrete]
     filterable = discrete+[x for x in continuous if len(df[x].unique()) < 500]
