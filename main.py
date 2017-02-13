@@ -124,12 +124,14 @@ def get_scenarios():
             runs_path = runs_path.strip()
             #if the path is pointing to a csv file, gather all scenarios from that file
             if os.path.isfile(runs_path) and runs_path.lower().endswith('.csv'):
+                custom_sorts['scenario'] = []
                 abs_path = str(os.path.abspath(runs_path))
                 df_scen = pd.read_csv(abs_path)
                 for i_scen, scen in df_scen.iterrows():
                     if os.path.isdir(scen['path']):
                         abs_path_scen = os.path.abspath(scen['path'])
                         if os.path.isdir(abs_path_scen+'/gdxfiles'):
+                            custom_sorts['scenario'].append(scen['name'])
                             scenarios.append({'name': scen['name'], 'path': abs_path_scen})
             #Else if the path is pointing to a directory, check if the directory is a run folder
             #containing gdxfiles/ and use this as the lone scenario. Otherwise, it must contain
@@ -301,6 +303,11 @@ def set_df_plots():
             active = [float(i) for i in active]
         df_plots = df_plots[df_plots[col].isin(active)]
 
+    #Filter based on custom sorting
+    for col in custom_sorts:
+        if col in df_plots:
+            df_plots = df_plots[df_plots[col].isin(custom_sorts[col])]
+
     #Scale Axes
     if wdg['x_scale'].value != '' and wdg['x'].value in continuous:
         df_plots[wdg['x'].value] = df_plots[wdg['x'].value] * float(wdg['x_scale'].value)
@@ -322,7 +329,18 @@ def set_df_plots():
     if wdg['series'].value != 'None': sortby_cols = [wdg['series'].value] + sortby_cols
     if wdg['explode'].value != 'None': sortby_cols = [wdg['explode'].value] + sortby_cols
     if wdg['explode_group'].value != 'None': sortby_cols = [wdg['explode_group'].value] + sortby_cols
-    df_plots = df_plots.sort_values(sortby_cols).reset_index(drop=True)
+    #change sortby_cols if there is custom sorting, and add custom sorting columns
+    temp_sort_cols = sortby_cols[:]
+    for col in custom_sorts:
+        if col in sortby_cols:
+            df_plots[col + '__sort_col'] = df_plots[col].map(lambda x: custom_sorts[col].index(x))
+            temp_sort_cols[sortby_cols.index(col)] = col + '__sort_col'
+    #Do sorting
+    df_plots = df_plots.sort_values(temp_sort_cols).reset_index(drop=True)
+    #Remove custom sort columns
+    for col in custom_sorts:
+        if col in sortby_cols:
+            df_plots = df_plots.drop(col + '__sort_col', 1)
 
     #Rearrange column order for csv download
     unsorted_columns = [col for col in df_plots.columns if col not in sortby_cols + [wdg['y'].value]]
@@ -508,6 +526,7 @@ def download():
 #and widget configuration object (wdg_config)
 init_load = True
 wdg_config = {}
+custom_sorts = {}
 scenarios = []
 result_dfs = {}
 data_file = ''
