@@ -395,9 +395,9 @@ def create_figure(df_exploded, explode_val=None, explode_group=None):
             #one break to the next so that each entry is unique
             kw['x_range'].append(' ' * (i + 1))
     elif wdg['x'].value in discrete:
-        kw['x_range'] = sorted(set(xs))
+        kw['x_range'] = df_exploded[x_col].unique().tolist()
     if wdg['y'].value in discrete:
-        kw['y_range'] = sorted(set(ys))
+        kw['y_range'] = df_exploded[wdg['y'].value].unique().tolist()
 
     #Set figure title
     kw['title'] = wdg['plot_title'].value
@@ -446,7 +446,7 @@ def create_figure(df_exploded, explode_val=None, explode_group=None):
     else:
         full_series = df_plots[wdg['series'].value].unique().tolist() #for colors only
         if wdg['series_stack'].value == 'Stacked':
-            xs_full = sorted(df_exploded[x_col].unique().tolist())
+            xs_full = df_exploded[x_col].unique().tolist()
             y_bases_pos = [0]*len(xs_full)
             y_bases_neg = [0]*len(xs_full)
         for i, ser in enumerate(df_exploded[wdg['series'].value].unique().tolist()):
