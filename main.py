@@ -495,7 +495,9 @@ def build_series_legend():
     series_legend_string = '<div class="legend-header">Series Legend</div><div class="legend-body">'
     if wdg['series'].value != 'None':
         active_list = df_plots[wdg['series'].value].unique().tolist()
-        for i, txt in reversed(list(enumerate(active_list))):
+        series_iter = list(enumerate(active_list))
+        if wdg['series_stack'].value == 'Stacked': series_iter = reversed(series_iter)
+        for i, txt in series_iter:
             series_legend_string += '<div class="legend-entry"><span class="legend-color" style="background-color:' + str(COLORS[i]) + ';"></span>'
             series_legend_string += '<span class="legend-text">' + str(txt) +'</span></div>'
     series_legend_string += '</div>'
