@@ -79,3 +79,8 @@ body {
     display: inline-block;
     margin-right: 10px
 }
+.wdgkey-runs label,
+.wdgkey-result label{
+    font-weight: bold;
+    text-decoration: underline;
+}
