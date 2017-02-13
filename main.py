@@ -77,15 +77,10 @@ results_meta = collections.OrderedDict((
 
 
 columns_meta = {
-#     'tech':{
-#         'type': 'string',
-#         'filter': 'multiple',
-#         'full_set': techs_full,
-#         'colors': display_techs_colors,
-#         'options': ['series'],
-#         'merge': tech_map,
-#         'colors': tech_colors,
-#     },
+    'tech':{
+        'type': 'string',
+        'map': os.path.dirname(os.path.realpath(__file__)) + '/csv/tech_map.csv',
+    },
 #     'n':{
 #         'type': 'string',
 #         'filter': 'single',
@@ -169,10 +164,10 @@ def get_data():
         cur_scenarios = result_dfs[result]['scenario'].unique().tolist() #the scenarios that have already been retrieved and stored in result_dfs
     #For each selected scenario, retrieve the data from gdx if we don't already have it,
     #and update result_dfs with the new data.
+    result_meta = results_meta[result]
     for i in topwdg['filter_scenarios'].active:
         scenario_name = scenarios[i]['name']
         if scenario_name not in cur_scenarios:
-            result_meta = results_meta[result]
             #get the gdx result and preprocess
             df_scen_result = gdxpds.to_dataframe(scenarios[i]['path'] + '\\gdxfiles\\' + result_meta['file'], result_meta['param'])[result_meta['param']]
             df_scen_result.columns = result_meta['columns']
@@ -184,7 +179,19 @@ def get_data():
             else:
                 result_dfs[result] = pd.concat([result_dfs[result], df_scen_result]).reset_index(drop=True)
 
+
     df = result_dfs[result]
+
+    #apply mappings
+    for col in result_meta['columns']:
+        if col in columns_meta and 'map' in columns_meta[col]:
+            df_map = pd.read_csv(columns_meta[col]['map'])
+            #filter out values that aren't in raw column
+            df = df[df[col].isin(df_map['raw'].values.tolist())]
+            #now map from raw to display
+            map_dict = dict(zip(list(df_map['raw']), list(df_map['display'])))
+            df[col] = df[col].map(map_dict)
+
     columns = sorted(df.columns)
     for c in columns:
         if c in columns_meta and columns_meta[c]['type'] is 'number':
