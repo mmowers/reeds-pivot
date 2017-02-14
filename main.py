@@ -75,19 +75,22 @@ results_meta = collections.OrderedDict((
         'default_chart_type': 'stacked_area',
         }
     ),
-    # ('CO2 (Million Tonnes)',
-    #     {'file': 'Reporting.gdx',
-    #     'param': 'AnnualReport',
-    #     'columns': ['n', 'year', 'pollu_type', 'value'],
-    #     'default_xaxis': 'year',
-    #     'default_series': 'pollu_type',
-    #     'default_yaxis': 'value',
-    #     'default_aggregation': 'none',
-    #     'tranform': multiply(0.000001),
-    #     'unit': 'Million tonnes',
-    #     'default_chart_type': 'line',
-    #     'combined_default_chart_type': 'line',
-    #     'combined_default_aggregation': 'none'}),
+    ('Emissions',
+        {'file': 'Reporting.gdx',
+        'param': 'AnnualReport',
+        'columns': ['n', 'year', 'type', 'value'],
+        'default_xaxis': 'year',
+        'default_series': 'pollu_type',
+        'default_yaxis': 'value',
+        'default_aggregation': 'none',
+        # 'preprocess': [
+        #     {'func': scale_column, 'args': {'scale_factor': .001, 'column': 'Capacity (GW)'}},
+        #     {'func': scale_column_filtered, 'args': {'by_column': 'tech', 'by_vals': ['UPV', 'DUPV', 'distPV'], 'change_column': 'Capacity (GW)', 'scale_factor': 1/1.1}},
+        # ],
+        'unit': 'Million tonnes',
+        'default_chart_type': 'line',
+        }
+    ),
 ))
 
 
