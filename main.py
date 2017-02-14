@@ -199,8 +199,9 @@ def get_data():
             #get the gdx result and preprocess
             df_scen_result = gdxpds.to_dataframe(scenarios[i]['path'] + '\\gdxfiles\\' + result_meta['file'], result_meta['param'])[result_meta['param']]
             df_scen_result.columns = result_meta['columns']
-            for preprocess in result_meta['preprocess']:
-                df_scen_result = preprocess['func'](df_scen_result, **preprocess['args'])
+            if 'preprocess' in result_meta:
+                for preprocess in result_meta['preprocess']:
+                    df_scen_result = preprocess['func'](df_scen_result, **preprocess['args'])
             df_scen_result['scenario'] = scenario_name
             if result_dfs[result] is None:
                 result_dfs[result] = df_scen_result
@@ -334,7 +335,7 @@ def set_df_plots():
             df_plots = df_plots[df_plots[col].isin(custom_sorts[col])]
 
     #apply mappings
-    for col in columns_meta:
+    for col in df_plots.columns.values.tolist():
         if 'meta_map_'+col in topwdg and topwdg['meta_map_'+col].value != '':
             df_map = pd.read_csv(topwdg['meta_map_'+col].value)
             #filter out values that aren't in raw column
