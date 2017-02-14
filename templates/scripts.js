@@ -1,4 +1,7 @@
 $(document).ready(function(){
+    $('body').on('click', '.meta-dropdown', function(){
+        $('.meta-drop').toggle();
+    });
     $('body').on('click', '.filter-scenarios-dropdown', function(){
         $('.wdgkey-filter_scenarios').toggle();
     });

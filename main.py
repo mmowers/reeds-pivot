@@ -104,9 +104,18 @@ columns_meta = {
 #     },
 }
 
+def initialize(data_file):
+    topwdg['meta'] = bmw.Div(text='Meta', css_classes=['meta-dropdown'])
+    for col in columns_meta:
+        if 'map' in columns_meta[col]:
+            topwdg['meta_map_'+col] = bmw.TextInput(title=col+ ' map', value=columns_meta[col]['map'], css_classes=['wdgkey-meta_map_'+col, 'meta-drop'])
+            if init_load and 'meta_map_'+col in wdg_config: topwdg['meta_map_'+col].value = str(wdg_config['meta_map_'+col])
+            topwdg['meta_map_'+col].on_change('value', update_sel)
+        if 'style' in columns_meta[col]:
+            topwdg['meta_style_'+col] = bmw.TextInput(title=col+ ' style', value=columns_meta[col]['style'], css_classes=['wdgkey-meta_style_'+col, 'meta-drop'])
+            if init_load and 'meta_style_'+col in wdg_config: topwdg['meta_style_'+col].value = str(wdg_config['meta_style_'+col])
+            topwdg['meta_style_'+col].on_change('value', update_sel)
 
-def set_runs_wdg(data_file):
-    topwdg.clear()
     topwdg['runs'] = bmw.TextInput(title='Run(s)', value=data_file, css_classes=['wdgkey-runs'])
     if init_load and 'runs' in wdg_config: topwdg['runs'].value = str(wdg_config['runs'])
     topwdg['runs'].on_change('value', update_runs)
@@ -142,7 +151,11 @@ def get_scenarios():
                             abs_subdir = str(os.path.abspath(abs_path+'/'+subdir))
                             scenarios.append({'name': subdir, 'path': abs_subdir})
         #If we have scenarios, build widgets for scenario filters and result.
-        if scenarios is not []:
+
+        for key in ["filter_scenarios_dropdown", "filter_scenarios", "result"]:
+            topwdg.pop(key, None)
+
+        if scenarios:
             labels = [a['name'] for a in scenarios]
             topwdg['filter_scenarios_dropdown'] = bmw.Div(text='Filter Scenarios', css_classes=['filter-scenarios-dropdown'])
             topwdg['filter_scenarios'] = bmw.CheckboxGroup(labels=labels, active=list(range(len(labels))), css_classes=['wdgkey-filter_scenarios'])
@@ -181,16 +194,6 @@ def get_data():
 
 
     df = result_dfs[result]
-
-    #apply mappings
-    for col in result_meta['columns']:
-        if col in columns_meta and 'map' in columns_meta[col]:
-            df_map = pd.read_csv(columns_meta[col]['map'])
-            #filter out values that aren't in raw column
-            df = df[df[col].isin(df_map['raw'].values.tolist())]
-            #now map from raw to display
-            map_dict = dict(zip(list(df_map['raw']), list(df_map['display'])))
-            df[col] = df[col].map(map_dict)
 
     columns = sorted(df.columns)
     for c in columns:
@@ -314,6 +317,16 @@ def set_df_plots():
     for col in custom_sorts:
         if col in df_plots:
             df_plots = df_plots[df_plots[col].isin(custom_sorts[col])]
+
+    #apply mappings
+    for col in columns_meta:
+        if 'meta_map_'+col in topwdg and topwdg['meta_map_'+col].value != '':
+            df_map = pd.read_csv(topwdg['meta_map_'+col].value)
+            #filter out values that aren't in raw column
+            df_plots = df_plots[df_plots[col].isin(df_map['raw'].values.tolist())]
+            #now map from raw to display
+            map_dict = dict(zip(list(df_map['raw']), list(df_map['display'])))
+            df_plots[col] = df_plots[col].map(map_dict)
 
     #Scale Axes
     if wdg['x_scale'].value != '' and wdg['x'].value in continuous:
@@ -505,7 +518,6 @@ def build_series_legend():
 
 
 def update_runs(attr, old, new):
-    set_runs_wdg(topwdg['runs'].value)
     get_scenarios()
 
 def update_data(attr, old, new):
@@ -521,7 +533,7 @@ def update_sel(attr, old, new):
     update_plots()
 
 def update_plots():
-    if wdg['x'].value == 'None' or wdg['y'].value == 'None':
+    if 'x' not in wdg or wdg['x'].value == 'None' or wdg['y'].value == 'None':
         plots.children = []
         return
     set_df_plots()
@@ -549,7 +561,7 @@ if wdg_arr is not None:
 #build widgets and plots
 wdg = collections.OrderedDict()
 topwdg = collections.OrderedDict()
-set_runs_wdg(data_file)
+initialize(data_file)
 controls = bl.widgetbox(list(topwdg.values()), id='widgets_section')
 plots = bl.column([], id='plots_section')
 get_scenarios()

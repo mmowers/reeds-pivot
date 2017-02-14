@@ -28,6 +28,7 @@ body {
 .bk-plot-layout{
     display: inline-block;
 }
+.meta-drop,
 .x-drop,
 .y-drop,
 .series-drop,
@@ -44,6 +45,7 @@ body {
     color: purple;
     display: none;
 }
+.meta-dropdown,
 .x-dropdown,
 .y-dropdown,
 .series-dropdown,
@@ -83,4 +85,7 @@ body {
 .wdgkey-result label{
     font-weight: bold;
     text-decoration: underline;
+}
+.bk-widget-form-group{
+    margin-top: 10px;
 }
