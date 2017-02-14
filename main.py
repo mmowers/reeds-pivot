@@ -99,14 +99,10 @@ columns_meta = {
         'type': 'string',
         'map': os.path.dirname(os.path.realpath(__file__)) + '/csv/tech_map.csv',
     },
-#     'n':{
-#         'type': 'string',
-#         'filter': 'single',
-#         'full_set': pcas_full,
-#         'options': [],
-#         'merge': hierarchy,
-#         'colors': tech_colors,
-#     },
+    'n':{
+        'type': 'string',
+        'join': os.path.dirname(os.path.realpath(__file__)) + '/csv/hierarchy.csv',
+    },
     'year':{
         'type': 'number',
     },
@@ -126,13 +122,17 @@ def initialize(data_file):
     topwdg['meta'] = bmw.Div(text='Meta', css_classes=['meta-dropdown'])
     for col in columns_meta:
         if 'map' in columns_meta[col]:
-            topwdg['meta_map_'+col] = bmw.TextInput(title=col+ ' map', value=columns_meta[col]['map'], css_classes=['wdgkey-meta_map_'+col, 'meta-drop'])
+            topwdg['meta_map_'+col] = bmw.TextInput(title='"'+col+ '" Map', value=columns_meta[col]['map'], css_classes=['wdgkey-meta_map_'+col, 'meta-drop'])
             if init_load and 'meta_map_'+col in wdg_config: topwdg['meta_map_'+col].value = str(wdg_config['meta_map_'+col])
-            topwdg['meta_map_'+col].on_change('value', update_sel)
+            topwdg['meta_map_'+col].on_change('value', update_meta)
+        if 'join' in columns_meta[col]:
+            topwdg['meta_join_'+col] = bmw.TextInput(title='"'+col+ '" Join', value=columns_meta[col]['join'], css_classes=['wdgkey-meta_join_'+col, 'meta-drop'])
+            if init_load and 'meta_join_'+col in wdg_config: topwdg['meta_join_'+col].value = str(wdg_config['meta_join_'+col])
+            topwdg['meta_join_'+col].on_change('value', update_meta)
         if 'style' in columns_meta[col]:
-            topwdg['meta_style_'+col] = bmw.TextInput(title=col+ ' style', value=columns_meta[col]['style'], css_classes=['wdgkey-meta_style_'+col, 'meta-drop'])
+            topwdg['meta_style_'+col] = bmw.TextInput(title='"'+col+ '" Style', value=columns_meta[col]['style'], css_classes=['wdgkey-meta_style_'+col, 'meta-drop'])
             if init_load and 'meta_style_'+col in wdg_config: topwdg['meta_style_'+col].value = str(wdg_config['meta_style_'+col])
-            topwdg['meta_style_'+col].on_change('value', update_sel)
+            topwdg['meta_style_'+col].on_change('value', update_meta)
 
     topwdg['runs'] = bmw.TextInput(title='Run(s)', value=data_file, css_classes=['wdgkey-runs'])
     if init_load and 'runs' in wdg_config: topwdg['runs'].value = str(wdg_config['runs'])
@@ -184,7 +184,6 @@ def get_scenarios():
         controls.children = list(topwdg.values())
 
 def get_data():
-    global df, columns, discrete, continuous, filterable, seriesable
     result = topwdg['result'].value
     #A result has been selected, so either we retrieve it from result_dfs,
     #which is a dict with one dataframe for each result, or we make a new key in the result_dfs
@@ -211,10 +210,40 @@ def get_data():
             else:
                 result_dfs[result] = pd.concat([result_dfs[result], df_scen_result]).reset_index(drop=True)
 
+def process_data():
+    global df, columns, discrete, continuous, filterable, seriesable
+    df = result_dfs[topwdg['result'].value].copy()
 
-    df = result_dfs[result]
+    #Filter based on custom sorting
+    for col in custom_sorts:
+        if col in df:
+            df = df[df[col].isin(custom_sorts[col])]
 
-    columns = sorted(df.columns)
+    #apply joins
+    for col in df.columns.values.tolist():
+        if 'meta_join_'+col in topwdg and topwdg['meta_join_'+col].value != '':
+            df_join = pd.read_csv(topwdg['meta_join_'+col].value)
+            #remove columns to left of col in df_join
+            for c in df_join.columns.values.tolist():
+                if c == col:
+                    break
+                df_join.drop(c, axis=1, inplace=True)
+            #remove duplicate rows
+            df_join.drop_duplicates(subset=col, inplace=True)
+            #merge df_join into df
+            df = pd.merge(left=df, right=df_join, on=col, sort=False)
+
+    #apply mappings
+    for col in df.columns.values.tolist():
+        if 'meta_map_'+col in topwdg and topwdg['meta_map_'+col].value != '':
+            df_map = pd.read_csv(topwdg['meta_map_'+col].value)
+            #filter out values that aren't in raw column
+            df = df[df[col].isin(df_map['raw'].values.tolist())]
+            #now map from raw to display
+            map_dict = dict(zip(list(df_map['raw']), list(df_map['display'])))
+            df[col] = df[col].map(map_dict)
+
+    columns = df.columns.values.tolist()
     for c in columns:
         if c in columns_meta and columns_meta[c]['type'] is 'number':
             df[c] = pd.to_numeric(df[c], errors='coerce')
@@ -331,21 +360,6 @@ def set_df_plots():
         if col in continuous:
             active = [float(i) for i in active]
         df_plots = df_plots[df_plots[col].isin(active)]
-
-    #Filter based on custom sorting
-    for col in custom_sorts:
-        if col in df_plots:
-            df_plots = df_plots[df_plots[col].isin(custom_sorts[col])]
-
-    #apply mappings
-    for col in df_plots.columns.values.tolist():
-        if 'meta_map_'+col in topwdg and topwdg['meta_map_'+col].value != '':
-            df_map = pd.read_csv(topwdg['meta_map_'+col].value)
-            #filter out values that aren't in raw column
-            df_plots = df_plots[df_plots[col].isin(df_map['raw'].values.tolist())]
-            #now map from raw to display
-            map_dict = dict(zip(list(df_map['raw']), list(df_map['display'])))
-            df_plots[col] = df_plots[col].map(map_dict)
 
     #Scale Axes
     if wdg['x_scale'].value != '' and wdg['x'].value in continuous:
@@ -545,11 +559,18 @@ def update_data(attr, old, new):
 def get_data_and_build():
     if 'result' in topwdg and topwdg['result'].value is not 'None':
         get_data()
+        process_data()
         build_widgets()
         update_plots()
 
 def update_sel(attr, old, new):
     update_plots()
+
+def update_meta(attr, old, new):
+    if 'result' in topwdg and topwdg['result'].value is not 'None':
+        process_data()
+        build_widgets()
+        update_plots()
 
 def update_plots():
     if 'x' not in wdg or wdg['x'].value == 'None' or wdg['y'].value == 'None':
