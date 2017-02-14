@@ -60,6 +60,21 @@ results_meta = collections.OrderedDict((
         'default_chart_type': 'stacked_area',
         }
     ),
+    ('Generation (TWh)',
+        {'file': 'CONVqn.gdx',
+        'param': 'CONVqmnallyears',
+        'columns': ['tech', 'n', 'year', 'Generation (TWh)'],
+        'default_xaxis': 'year',
+        'default_series': 'tech',
+        'default_yaxis': 'Generation (TWh)',
+        'default_aggregation': 'sum',
+        'preprocess': [
+            {'func': scale_column, 'args': {'scale_factor': 0.000001, 'column': 'Generation (TWh)'}},
+        ],
+        'unit': 'TWh',
+        'default_chart_type': 'stacked_area',
+        }
+    ),
     # ('CO2 (Million Tonnes)',
     #     {'file': 'Reporting.gdx',
     #     'param': 'AnnualReport',
