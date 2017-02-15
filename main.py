@@ -581,7 +581,7 @@ def update_plots():
     create_figures()
 
 def download():
-    df_plots.to_csv('downloads/out '+datetime.datetime.now().strftime("%Y-%m-%d %H-%M-%S-%f")+'.csv', index=False)
+    df_plots.to_csv(os.path.dirname(os.path.realpath(__file__)) + '/downloads/out '+datetime.datetime.now().strftime("%Y-%m-%d %H-%M-%S-%f")+'.csv', index=False)
 
 #read 'widgets' parameter from URL query string and use to set data source (data_file)
 #and widget configuration object (wdg_config)
