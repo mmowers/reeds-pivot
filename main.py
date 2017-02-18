@@ -141,7 +141,7 @@ def initialize(data_file):
 def get_scenarios():
     if topwdg['runs'].value != '':
         scenarios[:] = []
-        runs_paths = topwdg['runs'].value.split(':')
+        runs_paths = topwdg['runs'].value.split('|')
         for runs_path in runs_paths:
             runs_path = runs_path.strip()
             #if the path is pointing to a csv file, gather all scenarios from that file
