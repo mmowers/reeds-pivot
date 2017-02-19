@@ -98,6 +98,7 @@ columns_meta = {
     'tech':{
         'type': 'string',
         'map': os.path.dirname(os.path.realpath(__file__)) + '/csv/tech_map.csv',
+        'style': os.path.dirname(os.path.realpath(__file__)) + '/csv/tech_style.csv',
     },
     'n':{
         'type': 'string',
@@ -242,6 +243,12 @@ def process_data():
             #now map from raw to display
             map_dict = dict(zip(list(df_map['raw']), list(df_map['display'])))
             df[col] = df[col].map(map_dict)
+
+    #apply custom styling
+    for col in df.columns.values.tolist():
+        if 'meta_style_'+col in topwdg and topwdg['meta_style_'+col].value != '':
+            df_style = pd.read_csv(topwdg['meta_style_'+col].value)
+            custom_sorts[col] = df_style['order'].tolist()
 
     columns = df.columns.values.tolist()
     for c in columns:
