@@ -248,6 +248,9 @@ def process_data():
     for col in df.columns.values.tolist():
         if 'meta_style_'+col in topwdg and topwdg['meta_style_'+col].value != '':
             df_style = pd.read_csv(topwdg['meta_style_'+col].value)
+            #filter out values that aren't in order column
+            df = df[df[col].isin(df_style['order'].values.tolist())]
+            #add to custom_sorts with new order
             custom_sorts[col] = df_style['order'].tolist()
 
     columns = df.columns.values.tolist()
