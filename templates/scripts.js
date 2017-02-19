@@ -66,39 +66,6 @@ $(document).ready(function(){
         var widgets_string = encodeURIComponent(JSON.stringify(wdg_obj));
         window.history.pushState({}, "", "reeds-pivot?widgets=" + widgets_string);
     });
-
-// Pressing Alt+period key collapses menus.
-//     var collapseKeys = [0,0];
-//     $(document).keydown(function(e) {
-//       if(e.which == 18) {
-//         collapseKeys[0] = 1;
-//       }
-//       if(e.which == 190) {
-//         collapseKeys[1] = 1;
-//       }
-//       if(collapseKeys[0] == 1 && collapseKeys[1] == 1){
-//         $('.meta-drop').hide();
-//         $('.wdgkey-filter_scenarios').hide();
-//         $('.x-drop').hide();
-//         $('.y-drop').hide();
-//         $('.legend-body').hide();
-//         $('.series-drop').hide();
-//         $('.explode-drop').hide();
-//         $('.filter-head').hide();
-//         $('.filters-update').hide();
-//         $('.select-all-none').hide();
-//         $('.filter').hide();
-//         $('.adjust-drop').hide();
-//       }
-//     });
-//     $(document).keyup(function(e) {
-//       if(e.which == 18) {
-//         collapseKeys[0] = 0;
-//       }
-//       if(e.which == 190) {
-//         collapseKeys[1] = 0;
-//       }
-//     });
 });
 //pressing Alt key will collapse menus.
 document.onkeydown = function(e) {
