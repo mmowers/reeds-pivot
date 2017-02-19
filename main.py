@@ -1,7 +1,7 @@
 from __future__ import division
 import os
 import os.path
-import gdxpds
+import gdxl
 import math
 import json
 import numpy as np
@@ -200,7 +200,7 @@ def get_data():
         scenario_name = scenarios[i]['name']
         if scenario_name not in cur_scenarios:
             #get the gdx result and preprocess
-            df_scen_result = gdxpds.to_dataframe(scenarios[i]['path'] + '\\gdxfiles\\' + result_meta['file'], result_meta['param'])[result_meta['param']]
+            df_scen_result = gdxl.get_df(scenarios[i]['path'] + '\\gdxfiles\\' + result_meta['file'], result_meta['param'])
             df_scen_result.columns = result_meta['columns']
             if 'preprocess' in result_meta:
                 for preprocess in result_meta['preprocess']:
