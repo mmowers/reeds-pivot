@@ -75,7 +75,13 @@ results_meta = collections.OrderedDict((
         'default_chart_type': 'stacked_area',
         }
     ),
-    ('Emissions',
+    ('Gen by m',
+        {'file': 'CONVqn.gdx',
+        'param': 'CONVqmnallm',
+        'columns': ['tech', 'n', 'year', 'm', 'Gen'],
+        }
+    ),
+    ('Emissions, Fuel, Prices',
         {'file': 'Reporting.gdx',
         'param': 'AnnualReport',
         'columns': ['n', 'year', 'type', 'value'],
@@ -83,12 +89,20 @@ results_meta = collections.OrderedDict((
         'default_series': 'pollu_type',
         'default_yaxis': 'value',
         'default_aggregation': 'none',
-        # 'preprocess': [
-        #     {'func': scale_column, 'args': {'scale_factor': .001, 'column': 'Capacity (GW)'}},
-        #     {'func': scale_column_filtered, 'args': {'by_column': 'tech', 'by_vals': ['UPV', 'DUPV', 'distPV'], 'change_column': 'Capacity (GW)', 'scale_factor': 1/1.1}},
-        # ],
         'unit': 'Million tonnes',
         'default_chart_type': 'line',
+        }
+    ),
+    ('Electricity Price',
+        {'file': 'Reporting.gdx',
+        'param': 'ElecPriceOut',
+        'columns': ['n', 'year', 'elem', 'value'],
+        }
+    ),
+    ('Total Cost',
+        {'file': 'Reporting.gdx',
+        'param': 'aSystemCost',
+        'columns': ['cost_cat', 'year', 'value'],
         }
     ),
 ))
