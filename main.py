@@ -229,11 +229,6 @@ def process_data():
     global df, columns, discrete, continuous, filterable, seriesable
     df = result_dfs[topwdg['result'].value].copy()
 
-    #Filter based on custom sorting
-    for col in custom_sorts:
-        if col in df:
-            df = df[df[col].isin(custom_sorts[col])]
-
     #apply joins
     for col in df.columns.values.tolist():
         if 'meta_join_'+col in topwdg and topwdg['meta_join_'+col].value != '':
