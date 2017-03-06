@@ -14,13 +14,9 @@ gas-CT,Gas-CT
 hydro,Hydro
 ocean,Ocean
 geothermal,Geothermal
-geo-EGS,Geothermal
-geo-EHS,Geothermal
-geo-hyd,Geothermal
 biopower,Biopower
 cofirebiomass,Biopower
 lfill-gas,Landfill-gas
-wind,Wind
 wind-ons,Wind
 wind-ofs,Wind
 wind-ofm,Wind
@@ -42,3 +38,4 @@ Gas-CC-NSP,Gas-CC
 Gas-CT-NSP,Gas-CT
 Coal-CCS-NSP,Coal-CCS
 Nuclear-NSP,Nuclear
+canada,Canada
