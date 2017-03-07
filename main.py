@@ -121,6 +121,10 @@ columns_meta = {
     'year':{
         'type': 'number',
     },
+    'm':{
+        'type': 'string',
+        'style': os.path.dirname(os.path.realpath(__file__)) + '/csv/m_style.csv',
+    }
 #     'value':{
 #         'type': 'number',
 #         'colors': pca_colors,
