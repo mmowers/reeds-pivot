@@ -34,7 +34,10 @@ CHARTTYPES = ['Dot', 'Line', 'Bar', 'Area']
 AGGREGATIONS = ['None', 'Sum']
 
 this_dir_path = os.path.dirname(os.path.realpath(__file__))
+inflation_mult = 1.2547221 #2004$ to 2015$ 
 
+
+#Preprocess functions
 def scale_column(datafrm, **kw):
     datafrm[kw['column']] = datafrm[kw['column']] * kw['scale_factor']
     return datafrm
@@ -44,6 +47,29 @@ def scale_column_filtered(datafrm, **kw):
     datafrm.loc[cond, kw['change_column']] = datafrm.loc[cond, kw['change_column']] * kw['scale_factor']
     return datafrm
 
+def discount_costs(datafrm, **kw):
+    #inner join the cost_cat_type.csv table to get types of costs (Capital, Operation)
+    cost_cat_type = pd.read_csv(this_dir_path + '/csv/cost_cat_type.csv')
+    df = pd.merge(left=datafrm, right=cost_cat_type, on='cost_cat', sort=False)
+    #make new column that is the pv multiplier
+    df['pv_mult'] = df.apply(lambda x: get_pv_mult(int(x['year']), x['type']), axis=1)
+    df['Discounted Cost (2015$)'] = df['Cost (2015$)'] * df['pv_mult']
+    return df
+
+#Return present value multiplier
+def get_pv_mult(year, type, dinvest=0.054439024, dsocial=0.03, lifetime=20, refyear=2015, lastyear=2050):
+    if type == "Operation":
+        pv_mult = 1 / (1 + dsocial)**(year - refyear)
+    elif type == "Capital":
+        pv_mult = CRF(dinvest, lifetime) / CRF(dinvest, min(lifetime, lastyear + 1 - year)) * 1 / (1 + dsocial)**(year - refyear)
+    return pv_mult
+
+#Capital recovery factor
+def CRF(i,n):
+    return i/(1-(1/(1+i)**n))
+
+
+#Results metadata
 results_meta = collections.OrderedDict((
     ('Capacity (GW)',
         {'file': 'CONVqn.gdx',
@@ -100,10 +126,14 @@ results_meta = collections.OrderedDict((
         'columns': ['n', 'year', 'elem', 'value'],
         }
     ),
-    ('Total Cost',
+    ('System Cost',
         {'file': 'Reporting.gdx',
         'param': 'aSystemCost',
-        'columns': ['cost_cat', 'year', 'value'],
+        'columns': ['cost_cat', 'year', 'Cost (2015$)'],
+        'preprocess': [
+            {'func': scale_column, 'args': {'scale_factor': inflation_mult, 'column': 'Cost (2015$)'}},
+            {'func': discount_costs, 'args': {}},
+        ],
         }
     ),
 ))
@@ -127,6 +157,11 @@ columns_meta = {
     'm':{
         'type': 'string',
         'style': this_dir_path + '/csv/m_style.csv',
+    },
+    'cost_cat':{
+        'type': 'string',
+        'map': this_dir_path + '/csv/cost_cat_map.csv',
+        'style': this_dir_path + '/csv/cost_cat_style.csv',
     },
 #     'value':{
 #         'type': 'number',
