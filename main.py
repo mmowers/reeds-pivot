@@ -108,7 +108,7 @@ results_meta = collections.OrderedDict((
     ),
 ))
 
-
+#Columns metadata.
 columns_meta = {
     'tech':{
         'type': 'string',
@@ -121,6 +121,8 @@ columns_meta = {
     },
     'year':{
         'type': 'number',
+        'filterable': True,
+        'seriesable': True,
     },
     'm':{
         'type': 'string',
@@ -273,8 +275,8 @@ def process_data():
             df[c] = pd.to_numeric(df[c], errors='coerce')
     discrete = [x for x in columns if df[x].dtype == object]
     continuous = [x for x in columns if x not in discrete]
-    filterable = discrete+[x for x in continuous if len(df[x].unique()) < 500]
-    seriesable = discrete+[x for x in continuous if len(df[x].unique()) < 60]
+    filterable = discrete+[x for x in continuous if x in columns_meta and columns_meta[x]['filterable']]
+    seriesable = discrete+[x for x in continuous if x in columns_meta and columns_meta[x]['seriesable']]
     df[discrete] = df[discrete].fillna('{BLANK}')
     df[continuous] = df[continuous].fillna(0)
 
