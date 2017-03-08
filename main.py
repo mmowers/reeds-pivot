@@ -33,6 +33,7 @@ C_NORM = "#31AADE"
 CHARTTYPES = ['Dot', 'Line', 'Bar', 'Area']
 AGGREGATIONS = ['None', 'Sum']
 
+this_dir_path = os.path.dirname(os.path.realpath(__file__))
 
 def scale_column(datafrm, **kw):
     datafrm[kw['column']] = datafrm[kw['column']] * kw['scale_factor']
@@ -111,20 +112,20 @@ results_meta = collections.OrderedDict((
 columns_meta = {
     'tech':{
         'type': 'string',
-        'map': os.path.dirname(os.path.realpath(__file__)) + '/csv/tech_map.csv',
-        'style': os.path.dirname(os.path.realpath(__file__)) + '/csv/tech_style.csv',
+        'map': this_dir_path + '/csv/tech_map.csv',
+        'style': this_dir_path + '/csv/tech_style.csv',
     },
     'n':{
         'type': 'string',
-        'join': os.path.dirname(os.path.realpath(__file__)) + '/csv/hierarchy.csv',
+        'join': this_dir_path + '/csv/hierarchy.csv',
     },
     'year':{
         'type': 'number',
     },
     'm':{
         'type': 'string',
-        'style': os.path.dirname(os.path.realpath(__file__)) + '/csv/m_style.csv',
-    }
+        'style': this_dir_path + '/csv/m_style.csv',
+    },
 #     'value':{
 #         'type': 'number',
 #         'colors': pca_colors,
@@ -604,7 +605,7 @@ def update_plots():
     create_figures()
 
 def download():
-    df_plots.to_csv(os.path.dirname(os.path.realpath(__file__)) + '/downloads/out '+datetime.datetime.now().strftime("%Y-%m-%d %H-%M-%S-%f")+'.csv', index=False)
+    df_plots.to_csv(this_dir_path + '/downloads/out '+datetime.datetime.now().strftime("%Y-%m-%d %H-%M-%S-%f")+'.csv', index=False)
 
 #read 'widgets' parameter from URL query string and use to set data source (data_file)
 #and widget configuration object (wdg_config)
