@@ -114,6 +114,16 @@ results_meta = collections.OrderedDict((
         'default_chart_type': 'line',
         }
     ),
+    ('BA-level System Cost',
+        {'file': 'systemcost.gdx',
+        'param': 'aSystemCost_ba',
+        'columns': ['cost_cat', 'n', 'year', 'Cost (2015$)'],
+        'preprocess': [
+            {'func': scale_column, 'args': {'scale_factor': inflation_mult, 'column': 'Cost (2015$)'}},
+            {'func': discount_costs, 'args': {}},
+        ],
+        }
+    ),
     ('System Cost',
         {'file': 'Reporting.gdx',
         'param': 'aSystemCost',
