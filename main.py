@@ -31,7 +31,7 @@ LINE_WIDTH = 2
 COLORS = ['#5e4fa2', '#3288bd', '#66c2a5', '#abdda4', '#e6f598', '#fee08b', '#fdae61', '#f46d43', '#d53e4f', '#9e0142']*1000
 C_NORM = "#31AADE"
 CHARTTYPES = ['Dot', 'Line', 'Bar', 'Area']
-AGGREGATIONS = ['None', 'Sum']
+AGGREGATIONS = ['None', 'Sum', 'Ave']
 
 this_dir_path = os.path.dirname(os.path.realpath(__file__))
 inflation_mult = 1.2547221 #2004$ to 2015$ 
@@ -619,13 +619,17 @@ def set_df_plots():
         df_plots[wdg['y'].value] = df_plots[wdg['y'].value] * float(wdg['y_scale'].value)
 
     #Apply Aggregation
-    if wdg['y_agg'].value == 'Sum' and wdg['y'].value in continuous:
+    if wdg['y'].value in continuous and wdg['y_agg'].value != 'None':
         groupby_cols = [wdg['x'].value]
         if wdg['x_group'].value != 'None': groupby_cols = [wdg['x_group'].value] + groupby_cols
         if wdg['series'].value != 'None': groupby_cols = [wdg['series'].value] + groupby_cols
         if wdg['explode'].value != 'None': groupby_cols = [wdg['explode'].value] + groupby_cols
         if wdg['explode_group'].value != 'None': groupby_cols = [wdg['explode_group'].value] + groupby_cols
-        df_plots = df_plots.groupby(groupby_cols, as_index=False, sort=False)[wdg['y'].value].sum()
+        df_grouped = df_plots.groupby(groupby_cols, as_index=False, sort=False)
+        if wdg['y_agg'].value == 'Sum':
+            df_plots = df_grouped[wdg['y'].value].sum()
+        elif wdg['y_agg'].value == 'Ave':
+            df_plots = df_grouped[wdg['y'].value].mean()
 
     #Sort Dataframe
     sortby_cols = [wdg['x'].value]
