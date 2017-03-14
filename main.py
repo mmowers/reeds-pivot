@@ -31,7 +31,7 @@ LINE_WIDTH = 2
 COLORS = ['#5e4fa2', '#3288bd', '#66c2a5', '#abdda4', '#e6f598', '#fee08b', '#fdae61', '#f46d43', '#d53e4f', '#9e0142']*1000
 C_NORM = "#31AADE"
 CHARTTYPES = ['Dot', 'Line', 'Bar', 'Area']
-AGGREGATIONS = ['None', 'Sum', 'Ave']
+AGGREGATIONS = ['None', 'Sum', 'Ave', 'Weighted Ave']
 
 this_dir_path = os.path.dirname(os.path.realpath(__file__))
 inflation_mult = 1.2547221 #2004$ to 2015$ 
@@ -515,6 +515,7 @@ def build_widgets():
     wdg['y_dropdown'] = bmw.Div(text='Y-Axis (required)', css_classes=['y-dropdown'])
     wdg['y'] = bmw.Select(title='Y-Axis (required)', value='None', options=['None'] + columns, css_classes=['wdgkey-y', 'y-drop'])
     wdg['y_agg'] = bmw.Select(title='Y-Axis Aggregation', value='Sum', options=AGGREGATIONS, css_classes=['wdgkey-y_agg', 'y-drop'])
+    wdg['y_weight'] = bmw.Select(title='Weighting', value='None', options=['None'] + columns, css_classes=['wdgkey-y_weight', 'y-drop'])
     wdg['series_dropdown'] = bmw.Div(text='Series', css_classes=['series-dropdown'])
     wdg['series_legend'] = bmw.Div(text='', css_classes=['series-drop'])
     wdg['series'] = bmw.Select(title='Separate Series By', value='None', options=['None'] + seriesable, css_classes=['wdgkey-series', 'series-drop'])
@@ -571,6 +572,7 @@ def build_widgets():
     wdg['x_group'].on_change('value', update_sel)
     wdg['y'].on_change('value', update_sel)
     wdg['y_agg'].on_change('value', update_sel)
+    wdg['y_weight'].on_change('value', update_sel)
     wdg['series'].on_change('value', update_sel)
     wdg['series_stack'].on_change('value', update_sel)
     wdg['explode'].on_change('value', update_sel)
@@ -625,11 +627,14 @@ def set_df_plots():
         if wdg['series'].value != 'None': groupby_cols = [wdg['series'].value] + groupby_cols
         if wdg['explode'].value != 'None': groupby_cols = [wdg['explode'].value] + groupby_cols
         if wdg['explode_group'].value != 'None': groupby_cols = [wdg['explode_group'].value] + groupby_cols
-        df_grouped = df_plots.groupby(groupby_cols, as_index=False, sort=False)
+        df_grouped = df_plots.groupby(groupby_cols, sort=False)
         if wdg['y_agg'].value == 'Sum':
-            df_plots = df_grouped[wdg['y'].value].sum()
+            df_plots = df_grouped[wdg['y'].value].sum().reset_index()
         elif wdg['y_agg'].value == 'Ave':
-            df_plots = df_grouped[wdg['y'].value].mean()
+            df_plots = df_grouped[wdg['y'].value].mean().reset_index()
+        elif wdg['y_agg'].value == 'Weighted Ave' and wdg['y_weight'].value in continuous:
+            df_plots = df_grouped.apply(wavg, wdg['y'].value, wdg['y_weight'].value).reset_index()
+            df_plots.rename(columns={0: wdg['y'].value}, inplace=True)
 
     #Sort Dataframe
     sortby_cols = [wdg['x'].value]
@@ -804,6 +809,15 @@ def build_series_legend():
     series_legend_string += '</div>'
     wdg['series_legend'].text =  series_legend_string
 
+def wavg(group, avg_name, weight_name):
+    """ http://pbpython.com/weighted-average.html
+    """
+    d = group[avg_name]
+    w = group[weight_name]
+    try:
+        return (d * w).sum() / w.sum()
+    except ZeroDivisionError:
+        return 0
 
 def update_runs(attr, old, new):
     get_scenarios()
