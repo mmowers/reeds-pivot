@@ -68,6 +68,14 @@ def get_pv_mult(year, type, dinvest=0.054439024, dsocial=0.03, lifetime=20, refy
 def CRF(i,n):
     return i/(1-(1/(1+i)**n))
 
+def pre_elec_price(df, **kw):
+    df = df.pivot_table(index=['n','year'], columns='elem', values='value').reset_index()
+    df.drop(['t2','t4','t5','t6','t7','t8','t9','t10','t11','t12','t13','t14','t15','t16'], axis='columns', inplace=True)
+    df.columns.name = None
+    df['t3'] = df['t3'] * inflation_mult
+    df['t17'] = df['t17'] * inflation_mult
+    df.rename(columns={'t1': 'load', 't3': 'Reg Price (2015$/MWh)', 't17': 'Comp Price (2015$/MWh)'}, inplace=True)
+    return df
 
 #Results metadata
 results_meta = collections.OrderedDict((
@@ -144,6 +152,9 @@ results_meta = collections.OrderedDict((
         {'file': 'Reporting.gdx',
         'param': 'ElecPriceOut',
         'columns': ['n', 'year', 'elem', 'value'],
+        'preprocess': [
+            {'func': pre_elec_price, 'args': {}},
+        ],
         }
     ),
     ('cap_wind',
