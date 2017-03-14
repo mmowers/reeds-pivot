@@ -38,19 +38,19 @@ inflation_mult = 1.2547221 #2004$ to 2015$
 
 
 #Preprocess functions
-def scale_column(datafrm, **kw):
-    datafrm[kw['column']] = datafrm[kw['column']] * kw['scale_factor']
-    return datafrm
+def scale_column(df, **kw):
+    df[kw['column']] = df[kw['column']] * kw['scale_factor']
+    return df
 
-def scale_column_filtered(datafrm, **kw):
-    cond = datafrm[kw['by_column']].isin(kw['by_vals'])
-    datafrm.loc[cond, kw['change_column']] = datafrm.loc[cond, kw['change_column']] * kw['scale_factor']
-    return datafrm
+def scale_column_filtered(df, **kw):
+    cond = df[kw['by_column']].isin(kw['by_vals'])
+    df.loc[cond, kw['change_column']] = df.loc[cond, kw['change_column']] * kw['scale_factor']
+    return df
 
-def discount_costs(datafrm, **kw):
+def discount_costs(df, **kw):
     #inner join the cost_cat_type.csv table to get types of costs (Capital, Operation)
     cost_cat_type = pd.read_csv(this_dir_path + '/csv/cost_cat_type.csv')
-    df = pd.merge(left=datafrm, right=cost_cat_type, on='cost_cat', sort=False)
+    df = pd.merge(left=df, right=cost_cat_type, on='cost_cat', sort=False)
     #make new column that is the pv multiplier
     df['pv_mult'] = df.apply(lambda x: get_pv_mult(int(x['year']), x['type']), axis=1)
     df['Discounted Cost (2015$)'] = df['Cost (2015$)'] * df['pv_mult']
