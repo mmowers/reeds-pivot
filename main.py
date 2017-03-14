@@ -534,6 +534,10 @@ def build_widgets():
     wdg['explode_dropdown'] = bmw.Div(text='Explode', css_classes=['explode-dropdown'])
     wdg['explode'] = bmw.Select(title='Explode By', value='None', options=['None'] + seriesable, css_classes=['wdgkey-explode', 'explode-drop'])
     wdg['explode_group'] = bmw.Select(title='Group Exploded Charts By', value='None', options=['None'] + seriesable, css_classes=['wdgkey-explode_group', 'explode-drop'])
+    wdg['adv_dropdown'] = bmw.Div(text='Advanced Operations', css_classes=['adv-dropdown'])
+    wdg['adv_op'] = bmw.Select(title='Operation', value='None', options=['None', 'Difference'], css_classes=['wdgkey-adv_op', 'adv-drop'])
+    wdg['adv_col'] = bmw.Select(title='Column', value='None', options=['None'] + columns, css_classes=['wdgkey-adv_col', 'adv-drop'])
+    wdg['adv_col_base'] = bmw.Select(title='Base', value='None', options=['None'], css_classes=['wdgkey-adv_col_base', 'adv-drop'])
     wdg['filters'] = bmw.Div(text='Filters', css_classes=['filters-dropdown'])
     for j, col in enumerate(filterable):
         val_list = [str(i) for i in sorted(df[col].unique().tolist())]
@@ -588,6 +592,9 @@ def build_widgets():
     wdg['series_stack'].on_change('value', update_sel)
     wdg['explode'].on_change('value', update_sel)
     wdg['explode_group'].on_change('value', update_sel)
+    wdg['adv_op'].on_change('value', update_sel)
+    wdg['adv_col'].on_change('value', update_adv_col)
+    wdg['adv_col_base'].on_change('value', update_sel)
     wdg['plot_title'].on_change('value', update_sel)
     wdg['plot_title_size'].on_change('value', update_sel)
     wdg['plot_width'].on_change('value', update_sel)
@@ -646,6 +653,31 @@ def set_df_plots():
         elif wdg['y_agg'].value == 'Weighted Ave' and wdg['y_weight'].value in continuous:
             df_plots = df_grouped.apply(wavg, wdg['y'].value, wdg['y_weight'].value).reset_index()
             df_plots.rename(columns={0: wdg['y'].value}, inplace=True)
+
+    #Do Advanced Operations
+    op = wdg['adv_op'].value
+    col = wdg['adv_col'].value
+    col_base = wdg['adv_col_base'].value
+    y_val = wdg['y'].value
+    y_agg = wdg['y_agg'].value
+    if op != 'None' and col != 'None' and col in df_plots and col_base != 'None' and y_agg != 'None' and y_val in continuous:
+        if col in continuous and col_base != 'Consecutive':
+            col_base = float(col_base)
+        col_list = df_plots[col].unique().tolist()
+        if col_base != 'Consecutive':
+            col_list.remove(col_base)
+            col_list = [col_base] + col_list
+        df_plots['tempsort'] = df_plots[col].map(lambda x: col_list.index(x))
+        df_plots = df_plots.sort_values('tempsort').reset_index(drop=True)
+        df_plots.drop(['tempsort'], axis='columns', inplace=True)
+        groupcols = [i for i in df_plots.columns.values.tolist() if i not in [col, y_val]]
+        if op == 'Difference':
+            if col_base == 'Consecutive':
+                df_plots[y_val] = df_plots.groupby(groupcols, sort=False)[y_val].diff()
+            else:
+                df_plots[y_val] = df_plots[y_val] - df_plots.groupby(groupcols, sort=False)[y_val].transform('first')
+        df_plots = df_plots[~df_plots[col].isin([col_base])]
+        df_plots = df_plots[pd.notnull(df_plots[y_val])]
 
     #Sort Dataframe
     sortby_cols = [wdg['x'].value]
@@ -841,6 +873,11 @@ def get_data_and_build():
         get_data()
         process_data()
         build_widgets()
+        update_plots()
+
+def update_adv_col(attr, old, new):
+    if wdg['adv_col'].value != 'None':
+        wdg['adv_col_base'].options = ['None', 'Consecutive'] + [str(i) for i in sorted(df[wdg['adv_col'].value].unique().tolist())]
         update_plots()
 
 def update_sel(attr, old, new):

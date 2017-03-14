@@ -18,6 +18,9 @@ $(document).ready(function(){
     $('body').on('click', '.explode-dropdown', function(){
         $('.explode-drop').toggle();
     });
+    $('body').on('click', '.adv-dropdown', function(){
+        $('.adv-drop').toggle();
+    });
     $('body').on('click', '.filters-dropdown', function(){
         $('.filter-head').toggle();
         $('.filters-update').toggle();
@@ -77,6 +80,7 @@ document.onkeydown = function(e) {
     $('.legend-body').hide();
     $('.series-drop').hide();
     $('.explode-drop').hide();
+    $('.adv-drop').hide();
     $('.filter-head').hide();
     $('.filters-update').hide();
     $('.select-all-none').hide();
