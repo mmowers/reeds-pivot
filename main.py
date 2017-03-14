@@ -32,6 +32,8 @@ COLORS = ['#5e4fa2', '#3288bd', '#66c2a5', '#abdda4', '#e6f598', '#fee08b', '#fd
 C_NORM = "#31AADE"
 CHARTTYPES = ['Dot', 'Line', 'Bar', 'Area']
 AGGREGATIONS = ['None', 'Sum', 'Ave', 'Weighted Ave']
+ADV_BASES = ['Consecutive', 'Total']
+
 
 this_dir_path = os.path.dirname(os.path.realpath(__file__))
 inflation_mult = 1.2547221 #2004$ to 2015$ 
@@ -535,8 +537,8 @@ def build_widgets():
     wdg['explode'] = bmw.Select(title='Explode By', value='None', options=['None'] + seriesable, css_classes=['wdgkey-explode', 'explode-drop'])
     wdg['explode_group'] = bmw.Select(title='Group Exploded Charts By', value='None', options=['None'] + seriesable, css_classes=['wdgkey-explode_group', 'explode-drop'])
     wdg['adv_dropdown'] = bmw.Div(text='Advanced Operations', css_classes=['adv-dropdown'])
-    wdg['adv_op'] = bmw.Select(title='Operation', value='None', options=['None', 'Difference'], css_classes=['wdgkey-adv_op', 'adv-drop'])
-    wdg['adv_col'] = bmw.Select(title='Column', value='None', options=['None'] + columns, css_classes=['wdgkey-adv_col', 'adv-drop'])
+    wdg['adv_op'] = bmw.Select(title='Operation', value='None', options=['None', 'Difference', 'Ratio'], css_classes=['wdgkey-adv_op', 'adv-drop'])
+    wdg['adv_col'] = bmw.Select(title='Operate Across', value='None', options=['None'] + columns, css_classes=['wdgkey-adv_col', 'adv-drop'])
     wdg['adv_col_base'] = bmw.Select(title='Base', value='None', options=['None'], css_classes=['wdgkey-adv_col_base', 'adv-drop'])
     wdg['filters'] = bmw.Div(text='Filters', css_classes=['filters-dropdown'])
     for j, col in enumerate(filterable):
@@ -661,10 +663,10 @@ def set_df_plots():
     y_val = wdg['y'].value
     y_agg = wdg['y_agg'].value
     if op != 'None' and col != 'None' and col in df_plots and col_base != 'None' and y_agg != 'None' and y_val in continuous:
-        if col in continuous and col_base != 'Consecutive':
+        if col in continuous and col_base not in ADV_BASES:
             col_base = float(col_base)
         col_list = df_plots[col].unique().tolist()
-        if col_base != 'Consecutive':
+        if col_base not in ADV_BASES:
             col_list.remove(col_base)
             col_list = [col_base] + col_list
         df_plots['tempsort'] = df_plots[col].map(lambda x: col_list.index(x))
@@ -674,8 +676,17 @@ def set_df_plots():
         if op == 'Difference':
             if col_base == 'Consecutive':
                 df_plots[y_val] = df_plots.groupby(groupcols, sort=False)[y_val].diff()
+            elif col_base == 'Total':
+                df_plots[y_val] = df_plots[y_val] - df_plots.groupby(groupcols, sort=False)[y_val].transform('sum')
             else:
                 df_plots[y_val] = df_plots[y_val] - df_plots.groupby(groupcols, sort=False)[y_val].transform('first')
+        elif op == 'Ratio':
+            if col_base == 'Consecutive':
+                df_plots[y_val] = df_plots.groupby(groupcols, sort=False)[y_val].diff()
+            elif col_base == 'Total':
+                df_plots[y_val] = df_plots[y_val] / df_plots.groupby(groupcols, sort=False)[y_val].transform('sum')
+            else:
+                df_plots[y_val] = df_plots[y_val] / df_plots.groupby(groupcols, sort=False)[y_val].transform('first')
         df_plots = df_plots[~df_plots[col].isin([col_base])]
         df_plots = df_plots[pd.notnull(df_plots[y_val])]
 
@@ -877,7 +888,7 @@ def get_data_and_build():
 
 def update_adv_col(attr, old, new):
     if wdg['adv_col'].value != 'None':
-        wdg['adv_col_base'].options = ['None', 'Consecutive'] + [str(i) for i in sorted(df[wdg['adv_col'].value].unique().tolist())]
+        wdg['adv_col_base'].options = ['None'] + ADV_BASES + [str(i) for i in sorted(df[wdg['adv_col'].value].unique().tolist())]
         update_plots()
 
 def update_sel(attr, old, new):
