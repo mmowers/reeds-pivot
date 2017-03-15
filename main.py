@@ -663,6 +663,7 @@ def set_df_plots():
     y_val = wdg['y'].value
     y_agg = wdg['y_agg'].value
     if op != 'None' and col != 'None' and col in df_plots and col_base != 'None' and y_agg != 'None' and y_val in continuous:
+        #sort df_plots so that col_base is at the front, so that we can use transform('first') later
         if col in continuous and col_base not in ADV_BASES:
             col_base = float(col_base)
         col_list = df_plots[col].unique().tolist()
@@ -672,21 +673,32 @@ def set_df_plots():
         df_plots['tempsort'] = df_plots[col].map(lambda x: col_list.index(x))
         df_plots = df_plots.sort_values('tempsort').reset_index(drop=True)
         df_plots.drop(['tempsort'], axis='columns', inplace=True)
+        #groupby all columns that are not the operating column and y axis column so we can do operations on y-axis across the operating column
         groupcols = [i for i in df_plots.columns.values.tolist() if i not in [col, y_val]]
+        if groupcols != []:
+            df_grouped = df_plots.groupby(groupcols, sort=False)[y_val]
+        else:
+            #if we don't have other columns to group, make one, to prevent error
+            df_plots['tempgroup'] = 1
+            df_grouped = df_plots.groupby('tempgroup', sort=False)[y_val]
+        #Now do operations with the groups:
         if op == 'Difference':
             if col_base == 'Consecutive':
-                df_plots[y_val] = df_plots.groupby(groupcols, sort=False)[y_val].diff()
+                df_plots[y_val] = df_grouped.diff()
             elif col_base == 'Total':
-                df_plots[y_val] = df_plots[y_val] - df_plots.groupby(groupcols, sort=False)[y_val].transform('sum')
+                df_plots[y_val] = df_plots[y_val] - df_grouped.transform('sum')
             else:
-                df_plots[y_val] = df_plots[y_val] - df_plots.groupby(groupcols, sort=False)[y_val].transform('first')
+                df_plots[y_val] = df_plots[y_val] - df_grouped.transform('first')
         elif op == 'Ratio':
             if col_base == 'Consecutive':
-                df_plots[y_val] = df_plots.groupby(groupcols, sort=False)[y_val].diff()
+                df_plots[y_val] = df_grouped.diff()
             elif col_base == 'Total':
-                df_plots[y_val] = df_plots[y_val] / df_plots.groupby(groupcols, sort=False)[y_val].transform('sum')
+                df_plots[y_val] = df_plots[y_val] / df_grouped.transform('sum')
             else:
-                df_plots[y_val] = df_plots[y_val] / df_plots.groupby(groupcols, sort=False)[y_val].transform('first')
+                df_plots[y_val] = df_plots[y_val] / df_grouped.transform('first')
+        #Finally, clean up df_plots, dropping unnecessary columns, rows with the base value, and any rows with NAs for y_vals
+        if 'tempgroup' in df_plots:
+            df_plots.drop(['tempgroup'], axis='columns', inplace=True)
         df_plots = df_plots[~df_plots[col].isin([col_base])]
         df_plots = df_plots[pd.notnull(df_plots[y_val])]
 
