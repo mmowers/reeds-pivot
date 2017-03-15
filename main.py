@@ -159,6 +159,30 @@ results_meta = collections.OrderedDict((
         ],
         }
     ),
+    ('Water Withdrawals',
+        {'file': "water_output.gdx",
+        'param': 'WaterWqctnallyears',
+        'columns': ["tech", "cool_tech", "n", "year", "Withdrawals (Bil Gallons)"],
+        'preprocess': [
+            {'func': scale_column, 'args': {'scale_factor': 0.001, 'column': 'Withdrawals (Bil Gallons)'}},
+        ],
+        }
+    ),
+    ('Water Consumption',
+        {'file': "water_output.gdx",
+        'param': 'WaterCqctnallyears',
+        'columns': ["tech", "cool_tech", "n", "year", "Consumption (Bil Gallons)"],
+        'preprocess': [
+            {'func': scale_column, 'args': {'scale_factor': 0.001, 'column': 'Consumption (Bil Gallons)'}},
+        ],
+        }
+    ),
+    ('wat_access',
+        {'file': "water_output.gdx",
+        'param': 'WatAccessallyears',
+        'columns': ["n", "class", "year", "value"],
+        }
+    ),
     ('cap_wind',
         {'file': 'CONVqn.gdx',
         'param': 'Windiallc',
@@ -313,24 +337,6 @@ results_meta = collections.OrderedDict((
         {'file': "Transmission.gdx",
         'param': 'ContractFlow',
         'columns': ["n", "n2", "year", "m", "value"],
-        }
-    ),
-    ('wat_with',
-        {'file': "water_output.gdx",
-        'param': 'WaterWqctnallyears',
-        'columns': ["tech", "cool_tech", "n", "year", "value"],
-        }
-    ),
-    ('wat_cons',
-        {'file': "water_output.gdx",
-        'param': 'WaterCqctnallyears',
-        'columns': ["tech", "cool_tech", "n", "year", "value"],
-        }
-    ),
-    ('wat_access',
-        {'file': "water_output.gdx",
-        'param': 'WatAccessallyears',
-        'columns': ["n", "class", "year", "value"],
         }
     ),
     ('obj_fnc',
