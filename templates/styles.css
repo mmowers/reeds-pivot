@@ -93,3 +93,8 @@ body {
 .bk-widget-form-group{
     margin-top: 10px;
 }
+.bk-root .bk-bs-btn.export-config{
+    width: 100%;
+    padding: 6px 0;
+    border: 0;
+}
