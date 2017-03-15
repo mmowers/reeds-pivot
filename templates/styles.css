@@ -61,6 +61,13 @@ body {
     margin-top: 20px;
     text-decoration: underline;
 }
+.wdgkey-runs label,
+.wdgkey-result label{
+    font-weight: bold;
+    color: blue;
+    cursor: pointer;
+    text-decoration: underline;
+}
 .select-opt{
     color: blue;
     cursor: pointer;
@@ -82,11 +89,6 @@ body {
     height: 10px;
     display: inline-block;
     margin-right: 10px
-}
-.wdgkey-runs label,
-.wdgkey-result label{
-    font-weight: bold;
-    text-decoration: underline;
 }
 .bk-widget-form-group{
     margin-top: 10px;
