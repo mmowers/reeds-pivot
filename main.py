@@ -31,6 +31,7 @@ LINE_WIDTH = 2
 COLORS = ['#5e4fa2', '#3288bd', '#66c2a5', '#abdda4', '#e6f598', '#fee08b', '#fdae61', '#f46d43', '#d53e4f', '#9e0142']*1000
 C_NORM = "#31AADE"
 CHARTTYPES = ['Dot', 'Line', 'Bar', 'Area']
+STACKEDTYPES = ['Bar', 'Area']
 AGGREGATIONS = ['None', 'Sum', 'Ave', 'Weighted Ave']
 ADV_BASES = ['Consecutive', 'Total']
 
@@ -538,7 +539,6 @@ def build_widgets():
     wdg['series_dropdown'] = bmw.Div(text='Series', css_classes=['series-dropdown'])
     wdg['series_legend'] = bmw.Div(text='', css_classes=['series-drop'])
     wdg['series'] = bmw.Select(title='Separate Series By', value='None', options=['None'] + seriesable, css_classes=['wdgkey-series', 'series-drop'])
-    wdg['series_stack'] = bmw.Select(title='Series Stacking', value='Unstacked', options=['Unstacked', 'Stacked'], css_classes=['wdgkey-series_stack', 'series-drop'])
     wdg['explode_dropdown'] = bmw.Div(text='Explode', css_classes=['explode-dropdown'])
     wdg['explode'] = bmw.Select(title='Explode By', value='None', options=['None'] + seriesable, css_classes=['wdgkey-explode', 'explode-drop'])
     wdg['explode_group'] = bmw.Select(title='Group Exploded Charts By', value='None', options=['None'] + seriesable, css_classes=['wdgkey-explode_group', 'explode-drop'])
@@ -597,7 +597,6 @@ def build_widgets():
     wdg['y_agg'].on_change('value', update_sel)
     wdg['y_weight'].on_change('value', update_sel)
     wdg['series'].on_change('value', update_sel)
-    wdg['series_stack'].on_change('value', update_sel)
     wdg['explode'].on_change('value', update_sel)
     wdg['explode_group'].on_change('value', update_sel)
     wdg['adv_op'].on_change('value', update_sel)
@@ -823,7 +822,7 @@ def create_figure(df_exploded, explode_val=None, explode_group=None):
         add_glyph(p, xs, ys, c)
     else:
         full_series = df_plots[wdg['series'].value].unique().tolist() #for colors only
-        if wdg['series_stack'].value == 'Stacked':
+        if wdg['chart_type'].value in STACKEDTYPES: #We are stacking the series
             xs_full = df_exploded[x_col].unique().tolist()
             y_bases_pos = [0]*len(xs_full)
             y_bases_neg = [0]*len(xs_full)
@@ -832,7 +831,7 @@ def create_figure(df_exploded, explode_val=None, explode_group=None):
             df_series = df_exploded[df_exploded[wdg['series'].value].isin([ser])]
             xs_ser = df_series[x_col].values.tolist()
             ys_ser = df_series[wdg['y'].value].values.tolist()
-            if wdg['series_stack'].value == 'Unstacked':
+            if wdg['chart_type'].value not in STACKEDTYPES: #The series will not be stacked
                 add_glyph(p, xs_ser, ys_ser, c, series=ser)
             else:
                 ys_pos = [ys_ser[xs_ser.index(x)] if x in xs_ser and ys_ser[xs_ser.index(x)] > 0 else 0 for i, x in enumerate(xs_full)]
@@ -874,7 +873,7 @@ def build_series_legend():
     if wdg['series'].value != 'None':
         active_list = df_plots[wdg['series'].value].unique().tolist()
         series_iter = list(enumerate(active_list))
-        if wdg['series_stack'].value == 'Stacked': series_iter = reversed(series_iter)
+        if wdg['chart_type'].value in STACKEDTYPES: series_iter = reversed(series_iter)
         for i, txt in series_iter:
             series_legend_string += '<div class="legend-entry"><span class="legend-color" style="background-color:' + str(COLORS[i]) + ';"></span>'
             series_legend_string += '<span class="legend-text">' + str(txt) +'</span></div>'
