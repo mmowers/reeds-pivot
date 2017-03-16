@@ -2,7 +2,7 @@ $(document).ready(function(){
     $('body').on('click', '.meta-dropdown', function(){
         $('.meta-drop').toggle();
     });
-    $('body').on('click', '.wdgkey-runs label, .wdgkey-result label', function(){
+    $('body').on('click', '.wdgkey-runs label, .wdgkey-result label, .wdgkey-presets label', function(){
         $(this).next().toggle();
     });
     $('body').on('click', '.filter-scenarios-dropdown', function(){
@@ -79,6 +79,7 @@ document.onkeydown = function(e) {
     $('.meta-drop').hide();
     $('.wdgkey-runs input').hide();
     $('.wdgkey-result select').hide();
+    $('.wdgkey-presets select').hide();
     $('.wdgkey-filter_scenarios').hide();
     $('.x-drop').hide();
     $('.y-drop').hide();

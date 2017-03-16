@@ -86,43 +86,36 @@ results_meta = collections.OrderedDict((
         {'file': 'CONVqn.gdx',
         'param': 'CONVqnallyears',
         'columns': ['tech', 'n', 'year', 'Capacity (GW)'],
-        'default_xaxis': 'year',
-        'default_series': 'tech',
-        'default_yaxis': 'Capacity (GW)',
-        'default_aggregation': 'sum',
         'preprocess': [
             {'func': scale_column, 'args': {'scale_factor': .001, 'column': 'Capacity (GW)'}},
             {'func': scale_column_filtered, 'args': {'by_column': 'tech', 'by_vals': ['UPV', 'DUPV', 'distPV'], 'change_column': 'Capacity (GW)', 'scale_factor': 1/1.1}},
         ],
-        'unit': 'GW',
-        'default_chart_type': 'stacked_area',
+        'presets': collections.OrderedDict((
+            ('Stacked Capacity',{'x':'year','y':'Capacity (GW)', 'y_agg':'Sum','series':'tech', 'explode': 'scenario','chart_type':'Area'}),
+            ('Tech Compare',{'x':'year','y':'Capacity (GW)', 'y_agg':'Sum','series':'scenario', 'explode': 'tech','chart_type':'Line'}),
+        )),
         }
     ),
     ('Generation (TWh)',
         {'file': 'CONVqn.gdx',
         'param': 'CONVqmnallyears',
         'columns': ['tech', 'n', 'year', 'Generation (TWh)'],
-        'default_xaxis': 'year',
-        'default_series': 'tech',
-        'default_yaxis': 'Generation (TWh)',
-        'default_aggregation': 'sum',
         'preprocess': [
             {'func': scale_column, 'args': {'scale_factor': 0.000001, 'column': 'Generation (TWh)'}},
         ],
-        'unit': 'TWh',
-        'default_chart_type': 'stacked_area',
+        'presets': collections.OrderedDict((
+            ('Stacked Gen',{'x':'year','y':'Generation (TWh)', 'y_agg':'Sum','series':'tech', 'explode': 'scenario','chart_type':'Area'}),
+            ('Tech Compare',{'x':'year','y':'Generation (TWh)', 'y_agg':'Sum','series':'scenario', 'explode': 'tech','chart_type':'Line'}),
+        )),
         }
     ),
     ('Emissions, Fuel, Prices',
         {'file': 'Reporting.gdx',
         'param': 'AnnualReport',
         'columns': ['n', 'year', 'type', 'value'],
-        'default_xaxis': 'year',
-        'default_series': 'pollu_type',
-        'default_yaxis': 'value',
-        'default_aggregation': 'none',
-        'unit': 'Million tonnes',
-        'default_chart_type': 'line',
+        'presets': collections.OrderedDict((
+            ('Scenario Compare',{'x':'year','y':'value', 'y_agg':'Sum','series':'scenario', 'explode': 'type','chart_type':'Line'}),
+        )),
         }
     ),
     ('BA-level System Cost',
@@ -529,6 +522,8 @@ def build_widgets():
     global init_load
     wdg.clear()
 
+    preset_options = results_meta[topwdg['result'].value]['presets'].keys()
+    wdg['presets'] = bmw.Select(title='Presets', value='None', options=['None'] + preset_options, css_classes=['wdgkey-presets'])
     wdg['x_dropdown'] = bmw.Div(text='X-Axis (required)', css_classes=['x-dropdown'])
     wdg['x'] = bmw.Select(title='X-Axis (required)', value='None', options=['None'] + columns, css_classes=['wdgkey-x', 'x-drop'])
     wdg['x_group'] = bmw.Select(title='Group X-Axis By', value='None', options=['None'] + seriesable, css_classes=['wdgkey-x_group', 'x-drop'])
@@ -590,6 +585,7 @@ def build_widgets():
                     wdg[key].active = wdg_config[key]
         init_load = False
 
+    wdg['presets'].on_change('value', update_presets)
     wdg['chart_type'].on_change('value', update_sel)
     wdg['x'].on_change('value', update_sel)
     wdg['x_group'].on_change('value', update_sel)
@@ -907,6 +903,16 @@ def update_adv_col(attr, old, new):
     if wdg['adv_col'].value != 'None':
         wdg['adv_col_base'].options = ['None'] + ADV_BASES + [str(i) for i in sorted(df[wdg['adv_col'].value].unique().tolist())]
         update_plots()
+
+def update_presets(attr, old, new):
+    if wdg['presets'].value != 'None':
+        #set x to "None" so that the chart will not render until all presets have been set.
+        wdg['x'].value = 'None'
+        preset = results_meta[topwdg['result'].value]['presets'][wdg['presets'].value]
+        preset_keys_minus_x = [key for key in preset if key != 'x']
+        for key in preset_keys_minus_x:
+            wdg[key].value = preset[key]
+        wdg['x'].value = preset['x']
 
 def update_sel(attr, old, new):
     update_plots()
