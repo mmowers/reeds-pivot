@@ -118,7 +118,7 @@ results_meta = collections.OrderedDict((
         )),
         }
     ),
-    ('BA-level System Cost',
+    ('System Cost',
         {'file': 'systemcost.gdx',
         'param': 'aSystemCost_ba',
         'columns': ['cost_cat', 'n', 'year', 'Cost (2015$)'],
@@ -126,22 +126,18 @@ results_meta = collections.OrderedDict((
             {'func': scale_column, 'args': {'scale_factor': inflation_mult, 'column': 'Cost (2015$)'}},
             {'func': discount_costs, 'args': {}},
         ],
-        }
-    ),
-    ('System Cost',
-        {'file': 'Reporting.gdx',
-        'param': 'aSystemCost',
-        'columns': ['cost_cat', 'year', 'Cost (2015$)'],
-        'preprocess': [
-            {'func': scale_column, 'args': {'scale_factor': inflation_mult, 'column': 'Cost (2015$)'}},
-            {'func': discount_costs, 'args': {}},
-        ],
+        'presets': collections.OrderedDict((
+            ('Stacked (filter years!)',{'x':'scenario','y':'Discounted Cost (2015$)', 'y_agg':'Sum','series':'cost_cat', 'explode': 'None','chart_type':'Bar'}),
+        )),
         }
     ),
     ('Gen by m',
         {'file': 'CONVqn.gdx',
         'param': 'CONVqmnallm',
         'columns': ['tech', 'n', 'year', 'm', 'Gen'],
+        'presets': collections.OrderedDict((
+            ('Stacked Gen by m',{'x':'m','y':'Gen', 'y_agg':'Sum','series':'tech', 'explode': 'scenario','chart_type':'Bar'}),
+        )),
         }
     ),
     ('Electricity Price',
@@ -151,6 +147,10 @@ results_meta = collections.OrderedDict((
         'preprocess': [
             {'func': pre_elec_price, 'args': {}},
         ],
+        'presets': collections.OrderedDict((
+            ('National Competitive',{'x':'year','y':'Comp Price (2015$/MWh)', 'y_agg':'Weighted Ave', 'y_weight':'load', 'series':'scenario', 'chart_type':'Line'}),
+            ('National Regulated',{'x':'year','y':'Reg Price (2015$/MWh)', 'y_agg':'Weighted Ave', 'y_weight':'load', 'series':'scenario', 'chart_type':'Line'}),
+        )),
         }
     ),
     ('Water Withdrawals',
@@ -160,6 +160,9 @@ results_meta = collections.OrderedDict((
         'preprocess': [
             {'func': scale_column, 'args': {'scale_factor': 0.001, 'column': 'Withdrawals (Bil Gallons)'}},
         ],
+        'presets': collections.OrderedDict((
+            ('National',{'x':'year','y':'Withdrawals (Bil Gallons)', 'y_agg':'Sum', 'series':'scenario', 'chart_type':'Line'}),
+        )),
         }
     ),
     ('Water Consumption',
@@ -169,12 +172,25 @@ results_meta = collections.OrderedDict((
         'preprocess': [
             {'func': scale_column, 'args': {'scale_factor': 0.001, 'column': 'Consumption (Bil Gallons)'}},
         ],
+        'presets': collections.OrderedDict((
+            ('National',{'x':'year','y':'Consumption (Bil Gallons)', 'y_agg':'Sum', 'series':'scenario', 'chart_type':'Line'}),
+        )),
         }
     ),
     ('wat_access',
         {'file': "water_output.gdx",
         'param': 'WatAccessallyears',
         'columns': ["n", "class", "year", "value"],
+        }
+    ),
+    ('<Old> System Cost',
+        {'file': 'Reporting.gdx',
+        'param': 'aSystemCost',
+        'columns': ['cost_cat', 'year', 'Cost (2015$)'],
+        'preprocess': [
+            {'func': scale_column, 'args': {'scale_factor': inflation_mult, 'column': 'Cost (2015$)'}},
+            {'func': discount_costs, 'args': {}},
+        ],
         }
     ),
     ('cap_wind',
