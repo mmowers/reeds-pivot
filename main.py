@@ -148,8 +148,10 @@ results_meta = collections.OrderedDict((
             {'func': pre_elec_price, 'args': {}},
         ],
         'presets': collections.OrderedDict((
-            ('National Competitive',{'x':'year','y':'Comp Price (2015$/MWh)', 'y_agg':'Weighted Ave', 'y_weight':'load', 'series':'scenario', 'chart_type':'Line'}),
-            ('National Regulated',{'x':'year','y':'Reg Price (2015$/MWh)', 'y_agg':'Weighted Ave', 'y_weight':'load', 'series':'scenario', 'chart_type':'Line'}),
+            ('National Competitive',{'x':'year','y':'Comp Price (2015$/MWh)', 'y_agg':'Weighted Ave', 'y_weight':'load', 'series':'scenario', 'explode': 'None', 'chart_type':'Line'}),
+            ('Census Competitive',{'x':'year','y':'Comp Price (2015$/MWh)', 'y_agg':'Weighted Ave', 'y_weight':'load', 'series':'scenario', 'explode': 'censusregions', 'chart_type':'Line'}),
+            ('National Regulated',{'x':'year','y':'Reg Price (2015$/MWh)', 'y_agg':'Weighted Ave', 'y_weight':'load', 'series':'scenario', 'explode': 'None', 'chart_type':'Line'}),
+            ('Census Regulated',{'x':'year','y':'Reg Price (2015$/MWh)', 'y_agg':'Weighted Ave', 'y_weight':'load', 'series':'scenario', 'explode': 'censusregions', 'chart_type':'Line'}),
         )),
         }
     ),
