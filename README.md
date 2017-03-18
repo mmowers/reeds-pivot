@@ -10,11 +10,7 @@ There are two different ways to use this app: On Orion (easiest way), and locall
 ## Running on Orion (easiest)
 1. Simply log into Orion and visit http://localhost:5006 in chrome (you probably want to bookmark this URL).
 1. Select the app you'd like to run, in this case reeds-pivot (superpivot is the csv pivot chart maker).
-    * Note that both apps are running on the same bokeh server process. I simply used this command to start them both:
-      ```
-      bokeh serve --show \path\to\reeds-pivot \path\to\superpivot
-      ```
-      You can do the same locally to launch both apps at once.
+1. Go to the *Loading ReEDS data* section below
 
 ## Running Locally
 1. Follow instructions to install Anaconda for Python 2.7 and Bokeh: https://github.com/mmowers/superpivot#setting-up-from-scratch-if-you-dont-already-have-bokeh
@@ -22,11 +18,16 @@ There are two different ways to use this app: On Orion (easiest way), and locall
     ```
     python setup.py install
     ```
-1. Finally, git clone this repo to your computer, and launch the bokeh server and a browser window with:
+1. Finally, git clone this repo to your computer, and on command line (or git bash) enter
     ```
-    bokeh serve --show \path\to\this\app
+    bokeh serve --show \path\to\this\repo
     ```
-1. Instructions for using the app are below
+    This will launch the bokeh server and a browser window to view the app.
+    * Note that I simply used the same command to start the bokeh server process on Orion:
+      ```
+      bokeh serve D:\CommonGitRepos\Bokeh\reeds-pivot D:\CommonGitRepos\Bokeh\superpivot
+      ```
+1. Go to the *Loading ReEDS data* section below
 
 ## Loading ReEDS data
 After starting up the app in a browser window, follow these steps in order to fetch data.
@@ -57,7 +58,7 @@ After data is fetched for a given set of runs, a set of dropdowns will appear on
 
 ## Troubleshooting
 1. If the app seems to break, simply refresh the page. If a page refresh doesn't work, than restart the bokeh server (if using on local).
-1. On Orion, if page refreshes don't work to rectify problems, then notify Matt. He will simply kill the process and restart. If needed on Orion, you may also start a new bokeh server process, but it needs to be on a port that isn't being used. For example.
+1. On Orion, if page refreshes don't work to rectify problems, then notify Matt. He will simply kill the process and restart. If needed on Orion, you may also start a new bokeh server process, but it needs to be on a port that isn't being used (the current apps are running on port 5006, the default port for Bokeh). For example.
     ```
-    bokeh serve /path/to/this/app --show --port 5007
+    bokeh serve D:\CommonGitRepos\Bokeh\reeds-pivot --show --port 5007
     ```
