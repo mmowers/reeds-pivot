@@ -1,9 +1,9 @@
-# Exploding Pivot Charts
+# ReEDS Pivot Charts
 
 ## Intro
 This bokeh app creates pivot charts from ReEDS outputs.
 
-The core of this code is the same as the csv pivot tool here: https://github.com/mmowers/superpivot. Please see the README there to setup bokeh from scratch (as of now, only Python 2.7 has been tested, and only on Windows), and to see core functionality of the tool. Additional instructions and features are descrbed below.
+The core of this tool is the same as for the csv pivot tool: https://github.com/mmowers/superpivot. Please see that README for general instructions how to use the pivot functinonality. Additional instructions and features specific to reeds-pivot are descrbed below.
 
 There are two different ways to use this app: On Orion (easiest way), and locally. See the following sections for details on each.
 
@@ -38,7 +38,7 @@ After starting up the app in a browser window, follow these steps in order to fe
 1. *Result*: Select a result from the *Result* select box. It may take a few seconds to fetch the data, depending on the number of scenarios being analyzed.
 
 ## ReEDS explorer features
-After data is fetched for a given set of runs, a set of dropdowns will appear on the left, allowing you to select axes, series, and explode columns at will for the data (see https://github.com/mmowers/superpivot#running for more info on the core functionality/features). In addition to the core pivot functionality, the ReEDS explorer has these features:
+After data is fetched for a given set of runs, a set of dropdowns will appear on the left, allowing you to select axes, series, and explode columns at will for the data (see https://github.com/mmowers/superpivot#running for more info on the core functionality/features). In addition to the core pivot functionality, the following features are specific to the ReEDS explorer:
 1. *Presets*: You may select a preset result from the *Preset* select box. For example, for *Generation*, *Stacked Generation* is a preset result.
 1. *Meta*: Click the *Meta* section to expand, and see the files used for some default *maps* (to rename and aggregate ReEDS categories), *styles* (to reorder categories and style them), and *merges* (to join more columns, e.g. to add regional aggregations). If you'd like to update any of these files, simply edit the file (only if you're working locally), or point to a new file.
 1. *Y-Axis Aggregation*: Select *Sum*, *Average*, or *Weighted Average*. *Weighted Average* requires another field, the *Weighting Factor*. For electricity price, for example, select *load* as the *Weighting Factor*.
