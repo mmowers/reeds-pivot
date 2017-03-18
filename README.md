@@ -5,6 +5,17 @@ This bokeh app creates pivot charts from ReEDS outputs.
 
 The core of this code is the same as the csv pivot tool here: https://github.com/mmowers/superpivot. Please see the README there to setup bokeh from scratch (as of now, only Python 2.7 has been tested, and only on Windows), and to see core functionality of the tool. Additional instructions and features are descrbed below.
 
+There are two different ways to use this app: On Orion (easiest way), and locally. See the following sections for details on each.
+
+## Running on Orion (easiest)
+1. Simply log into Orion and visit http://localhost:5006 in chrome (you probably want to bookmark this URL).
+1. Select the app you'd like to run, in this case reeds-pivot (superpivot is the csv pivot chart maker).
+    * Note that both apps are running on the same bokeh server process. I simply used this command to start them both:
+      ```
+      bokeh serve --show \path\to\reeds-pivot \path\to\superpivot
+      ```
+      You can do the same locally to launch both apps at once.
+
 ## Running Locally
 1. Follow instructions to install Anaconda for Python 2.7 and Bokeh: https://github.com/mmowers/superpivot#setting-up-from-scratch-if-you-dont-already-have-bokeh
 1. This tool reads from the gdx outputs from ReEDS runs. The gams python bindings need to be installed so the necessary python modules are available for reading gdx data into Python. On command line, navigate to the Python API files for Python 2.7, e.g. C:\GAMS\win64\24.7\apifiles\Python\api and run this command:
@@ -16,15 +27,6 @@ The core of this code is the same as the csv pivot tool here: https://github.com
     bokeh serve --show \path\to\this\app
     ```
 1. Instructions for using the app are below
-
-## Running on Orion
-1. Simply log into Orion and visit http://localhost:5006 in chrome (you probably want to bookmark this URL).
-1. Select the app you'd like to run, in this case reeds-pivot (superpivot is the csv pivot chart maker).
-    * Note that both apps are running on the same bokeh server process. I simply used this command to start them both:
-      ```
-      bokeh serve --show \path\to\reeds-pivot \path\to\superpivot
-      ```
-      You can do the same locally to launch both apps at once.
 
 ## Loading ReEDS data
 After starting up the app in a browser window, follow these steps in order to fetch data.
