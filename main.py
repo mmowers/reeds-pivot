@@ -553,7 +553,7 @@ def build_widgets():
     wdg['explode_dropdown'] = bmw.Div(text='Explode', css_classes=['explode-dropdown'])
     wdg['explode'] = bmw.Select(title='Explode By', value='None', options=['None'] + seriesable, css_classes=['wdgkey-explode', 'explode-drop'])
     wdg['explode_group'] = bmw.Select(title='Group Exploded Charts By', value='None', options=['None'] + seriesable, css_classes=['wdgkey-explode_group', 'explode-drop'])
-    wdg['adv_dropdown'] = bmw.Div(text='Advanced Operations', css_classes=['adv-dropdown'])
+    wdg['adv_dropdown'] = bmw.Div(text='Comparisons', css_classes=['adv-dropdown'])
     wdg['adv_op'] = bmw.Select(title='Operation', value='None', options=['None', 'Difference', 'Ratio'], css_classes=['wdgkey-adv_op', 'adv-drop'])
     wdg['adv_col'] = bmw.Select(title='Operate Across', value='None', options=['None'] + columns, css_classes=['wdgkey-adv_col', 'adv-drop'])
     wdg['adv_col_base'] = bmw.Select(title='Base', value='None', options=['None'], css_classes=['wdgkey-adv_col_base', 'adv-drop'])
