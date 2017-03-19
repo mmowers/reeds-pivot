@@ -10,7 +10,8 @@ There are two different ways to use this app: On Orion (easiest way), and locall
 ## Running on Orion (easiest)
 1. Simply log into Orion and visit http://localhost:5006 in chrome (you probably want to bookmark this URL).
 1. Select the app you'd like to run, in this case reeds-pivot (superpivot is the csv pivot chart maker).
-1. Go to the *Loading ReEDS data* section below
+1. Go to the *Loading ReEDS data* section below.
+    * Note that the location of the code on Orion is *D:\\CommonGitRepos\\Bokeh\\reeds-pivot*
 
 ## Running Locally
 1. Follow instructions to install Anaconda for Python 2.7 and Bokeh: https://github.com/mmowers/superpivot#setting-up-from-scratch-if-you-dont-already-have-bokeh
@@ -54,7 +55,7 @@ After data is fetched for a given set of runs, a set of dropdowns will appear on
 1. You may interact with the bokeh server with multiple browser windows/tabs, and these interactions will be independent, so you can leave one result open in one tab while you load another in a separate tab, for example.
 1. The charts themselves have some useful features shown on the right-hand-side of each chart. For example, hovering over data on a chart will show you the series, x-value, and y-value of the data (not currently working for Area charts). You may also box-zoom or pan (and reset to go back to the initial view). Finally, the charts can be saved as pngs.
 1. Save any widget configuration for later use with the *Export Config to URL* button, and copy the resulting URL from the address bar. At a later time, you will be able to load the same view by simply visiting that URL. Note that the bokeh server needs to be running (on the same port) for this to work, and currently you cannot use the same URL on different machines because the paths to files in the *Meta* section are different (work in progress).
-1. Download any data you're viewing with the *Download csv* button. It will be downloaded into a timestamped file in the *downloads/* folder.
+1. Download any data you're viewing with the *Download csv* button. It will be downloaded into a timestamped file in the *downloads\\* folder. Note that if you're on Orion, the folder is in *D:\\CommonGitRepos\\Bokeh\\reeds-pivot*
 
 ## Troubleshooting
 1. If the app seems to break, simply refresh the page. If a page refresh doesn't work, than restart the bokeh server (if using on local).
