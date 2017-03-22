@@ -187,7 +187,7 @@ results_meta = collections.OrderedDict((
             {'func': scale_column, 'args': {'scale_factor': inflation_mult, 'column': 'Cost (2015$)'}},
         ],
         'presets': collections.OrderedDict((
-            ('Default',{'x':'year','y':'Cost (2015$)', 'y_agg':'Sum', 'series':'n', 'explode':'category', 'chart_type':'Bar'}),
+            ('Default',{'x':'year','y':'Cost (2015$)', 'y_agg':'Sum', 'series':'n', 'explode':'category', 'explode_group':'scenario', 'chart_type':'Bar'}),
         )),
         }
     ),
@@ -196,7 +196,7 @@ results_meta = collections.OrderedDict((
         'param': 'JediWindBuilds',
         'columns': ["category", "TRG", "windtype", "n", "year","Capacity (MW)"],
         'presets': collections.OrderedDict((
-            ('Default',{'x':'year','y':'Capacity (MW)', 'y_agg':'Sum', 'series':'n', 'explode':'category', 'chart_type':'Bar'}),
+            ('Default',{'x':'year','y':'Capacity (MW)', 'y_agg':'Sum', 'series':'n', 'explode':'category', 'explode_group':'scenario', 'chart_type':'Bar'}),
         )),
         }
     ),
