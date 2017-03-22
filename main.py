@@ -187,7 +187,7 @@ results_meta = collections.OrderedDict((
             {'func': scale_column, 'args': {'scale_factor': inflation_mult, 'column': 'Cost (2015$)'}},
         ],
         'presets': collections.OrderedDict((
-            ('Stacked Cost',{'x':'year','y':'Cost (2015$)', 'y_agg':'Sum', 'series':'category', 'explode':'scenario', 'chart_type':'Area'}),
+            ('Scenario Compare',{'x':'year','y':'Cost (2015$)', 'y_agg':'Sum', 'series':'scenario', 'explode':'category', 'chart_type':'Line'}),
         )),
         }
     ),
