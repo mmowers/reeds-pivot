@@ -609,7 +609,8 @@ def build_widgets():
     wdg['circle_size'] = bmw.TextInput(title='Circle Size (Dot Only)', value=str(CIRCLE_SIZE), css_classes=['wdgkey-circle_size', 'adjust-drop'])
     wdg['bar_width'] = bmw.TextInput(title='Bar Width (Bar Only)', value=str(BAR_WIDTH), css_classes=['wdgkey-bar_width', 'adjust-drop'])
     wdg['line_width'] = bmw.TextInput(title='Line Width (Line Only)', value=str(LINE_WIDTH), css_classes=['wdgkey-line_width', 'adjust-drop'])
-    wdg['download'] = bmw.Button(label='Download csv', button_type='success')
+    wdg['download'] = bmw.Button(label='Download View', button_type='success')
+    wdg['download_all'] = bmw.Button(label='Download Full Result', button_type='success')
     wdg['export_config'] = bmw.Div(text='Export Config to URL', css_classes=['export-config', 'bk-bs-btn', 'bk-bs-btn-success'])
 
     wdg['series_legend'].text = build_series_legend()
@@ -660,6 +661,7 @@ def build_widgets():
     wdg['line_width'].on_change('value', update_sel)
     wdg['update'].on_click(update_plots)
     wdg['download'].on_click(download)
+    wdg['download_all'].on_click(download_all)
 
     controls.children = list(topwdg.values()) + list(wdg.values())
 
@@ -971,7 +973,13 @@ def update_plots():
     create_figures()
 
 def download():
-    df_plots.to_csv(this_dir_path + '/downloads/out '+datetime.datetime.now().strftime("%Y-%m-%d %H-%M-%S-%f")+'.csv', index=False)
+    dl(df_plots)
+
+def download_all():
+    dl(df)
+
+def dl(df_in):
+    df_in.to_csv(this_dir_path + '/downloads/out '+datetime.datetime.now().strftime("%Y-%m-%d %H-%M-%S-%f")+'.csv', index=False)
 
 #read 'widgets' parameter from URL query string and use to set data source (data_file)
 #and widget configuration object (wdg_config)
