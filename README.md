@@ -15,7 +15,7 @@ There are two different ways to use this app: On Orion (easiest way), and locall
       ```
     * Here is a breakdown of the above command:
         * `bokeh serve`: Launch bokeh server. See http://bokeh.pydata.org/en/latest/docs/user_guide/server.html for more info.
-        * `D:\CommonGitRepos\Bokeh\reeds-pivot D:\CommonGitRepos\Bokeh\superpivot`: Paths to bokeh apps that we are running.
+        * `D:\CommonGitRepos\Bokeh\reeds-pivot D:\CommonGitRepos\Bokeh\superpivot`: Paths to bokeh apps that we are running. Note that these apps will be updated frequently. If you want to manage your own copies, simply copy these apps and enter the new paths instead.
         * `--show`: Open browser
         * `--port <your_port_num>`: Jonathan has assigned you a unique port on Orion to run your bokeh server. We can't all use the same port number because each port can only be used once.
 1. Go to the *Loading ReEDS data* section below.
@@ -69,8 +69,8 @@ After data is fetched for a given set of runs, a set of dropdowns will appear on
 1. If a page refresh doesn't work, then restart the bokeh server. If you have time, you can send Matt a screenshot of the error in the terminal window, if there is one.
 
 ## Modifying App Code
-* On local, modify the code at will. You may want to create a git branch for you modifications.
-* On Orion, please create a copy of D:\\CommonGitRepos\\Bokeh\\reeds-pivot and make modifications to that copy so that you don't effect others.
+* On local, modify the code at will. If the modifications would be useful for other team members, please push the changes back to origin.
+* On Orion, please create a copy of D:\\CommonGitRepos\\Bokeh\\reeds-pivot and make modifications to that copy so that you don't effect others who are working off the common repo.
 
  ## Resources
 This tool uses bokeh, built on python:
