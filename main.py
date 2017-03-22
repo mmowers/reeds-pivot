@@ -179,6 +179,27 @@ results_meta = collections.OrderedDict((
         )),
         }
     ),
+    ('JEDI Wind Cost',
+        {'file': "JediWind.gdx",
+        'param': 'JediWindCost',
+        'columns': ["category", "TRG", "windtype", "n", "year","Cost (2015$)"],
+        'preprocess': [
+            {'func': scale_column, 'args': {'scale_factor': inflation_mult, 'column': 'Cost (2015$)'}},
+        ],
+        'presets': collections.OrderedDict((
+            ('Default',{'x':'year','y':'Cost (2015$)', 'y_agg':'Sum', 'series':'n', 'explode':'category', 'chart_type':'Bar'}),
+        )),
+        }
+    ),
+    ('JEDI Wind Capacity',
+        {'file': "JediWind.gdx",
+        'param': 'JediWindBuilds',
+        'columns': ["category", "TRG", "windtype", "n", "year","Capacity (MW)"],
+        'presets': collections.OrderedDict((
+            ('Default',{'x':'year','y':'Capacity (MW)', 'y_agg':'Sum', 'series':'n', 'explode':'category', 'chart_type':'Bar'}),
+        )),
+        }
+    ),
     ('wat_access',
         {'file': "water_output.gdx",
         'param': 'WatAccessallyears',
