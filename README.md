@@ -8,14 +8,21 @@ The core of this tool is the same as for the csv pivot tool: https://github.com/
 There are two different ways to use this app: On Orion (easiest way), and locally. See the following sections for details on each.
 
 ## Running on Orion (easiest)
-1. Simply log into Orion and visit http://localhost:5006 in chrome (you probably want to bookmark this URL).
-1. Select the app you'd like to run, in this case reeds-pivot (superpivot is the csv pivot chart maker).
+1. Simply double click the *Launch Super Pivot.bat* file on your desktop on Orion. This will launch the bokeh server and a browser window with tabs for both *superpivot* (CSV/GDX viewer app) and *reeds-pivot* (this app).
+    * If you're curious, you can open the .bat file in a text editor. The command will look like:
+      ```
+      bokeh serve D:\CommonGitRepos\Bokeh\reeds-pivot D:\CommonGitRepos\Bokeh\superpivot --show --port <your_port_num>
+      ```
+    * Here is a breakdown of the above command:
+        * `bokeh serve`: Launch bokeh server. See http://bokeh.pydata.org/en/latest/docs/user_guide/server.html for more info.
+        * `D:\CommonGitRepos\Bokeh\reeds-pivot D:\CommonGitRepos\Bokeh\superpivot`: Paths to bokeh apps that we are running.
+        * `--show`: Open browser
+        * `--port <your_port_num>`: Jonathan has assigned you a unique port on Orion to run your bokeh server. We can't all use the same port number because each port can only be used once.
 1. Go to the *Loading ReEDS data* section below.
-    * Note that the location of the code on Orion is *D:\\CommonGitRepos\\Bokeh\\reeds-pivot*
 
 ## Running Locally
 1. Follow instructions to install Anaconda for Python 2.7 and Bokeh: https://github.com/mmowers/superpivot#setting-up-from-scratch-if-you-dont-already-have-bokeh
-1. This tool reads from the gdx outputs from ReEDS runs. The gams python bindings need to be installed so the necessary python modules are available for reading gdx data into Python. On command line, navigate to the Python API files for Python 2.7, e.g. C:\GAMS\win64\24.7\apifiles\Python\api and run this command:
+1. This tool reads from the gdx outputs from ReEDS runs. The gams python bindings need to be installed so the necessary python modules are available for reading gdx data into Python. On command line, navigate to the Python API files for Python 2.7, e.g. C:\\GAMS\\win64\\24.7\\apifiles\\Python\\api and run this command:
     ```
     python setup.py install
     ```
@@ -48,18 +55,31 @@ After data is fetched for a given set of runs, a set of dropdowns will appear on
     * Generation differences: Select *Generation* as *Result*, and select *Stacked Gen* under *Presets*. Then, under *Comparisons*, select *Operation*=*Difference*, *Operate Across*=*scenario*, and *Base*=your-base-case.
     * Generation Fraction: Select *Generation* as *Result*, and select *Stacked Gen* under *Presets*. Then, under *Comparisons*, select *Operation*=*Ratio*, *Operate Across*=*tech*, and *Base*=*Total*.
     * Capacity Differences, solve-year-to-solve-year: Select *Capacity* as *Result*, and select *Stacked Capacity* under *Presets*. Then, under *Comparisons*, select *Operation*=*Difference*, *Operate Across*=*year*, and *Base*=*Consecutive*.
+1. *Download*: Download any data you're viewing with the *Download View* button, or download all data for a given result with the *Download Full Result* button. It will be downloaded into a timestamped file in the *downloads\\* folder. Note that if you're on Orion, the folder is in *D:\\CommonGitRepos\\Bokeh\\reeds-pivot*
+1. *Export Config to URL*: Save any widget configuration for later use with this button, and copy the resulting URL from the address bar. At a later time, you will be able to load the same view by simply visiting that URL (with your bokeh server running). On Orion, you may also send the URL to someone else to view, and as long as your bokeh server is running, they will be able to view   Currently you cannot use the same URL on different machines because the paths to files in the *Meta* section are different (work in progress).
 
 ## Pro tips
 1. Pressing *Alt* will collapse all expandable sections.
 1. To suppress the automatic update of the plot while configuring the widgets, simply set *X-axis* to *None* to stop rendering of plots, then make your widget changes, then finally set *X-axis* to the value you'd like.
 1. You may interact with the bokeh server with multiple browser windows/tabs, and these interactions will be independent, so you can leave one result open in one tab while you load another in a separate tab, for example.
 1. The charts themselves have some useful features shown on the right-hand-side of each chart. For example, hovering over data on a chart will show you the series, x-value, and y-value of the data (not currently working for Area charts). You may also box-zoom or pan (and reset to go back to the initial view). Finally, the charts can be saved as pngs.
-1. Save any widget configuration for later use with the *Export Config to URL* button, and copy the resulting URL from the address bar. At a later time, you will be able to load the same view by simply visiting that URL. Note that the bokeh server needs to be running (on the same port) for this to work, and currently you cannot use the same URL on different machines because the paths to files in the *Meta* section are different (work in progress).
-1. Download any data you're viewing with the *Download csv* button. It will be downloaded into a timestamped file in the *downloads\\* folder. Note that if you're on Orion, the folder is in *D:\\CommonGitRepos\\Bokeh\\reeds-pivot*
 
 ## Troubleshooting
-1. If the app seems to break, simply refresh the page. If a page refresh doesn't work, than restart the bokeh server (if using on local).
-1. On Orion, if page refreshes don't work to rectify problems, then notify Matt. He will simply kill the process and restart. If needed on Orion, you may also start a new bokeh server process, but it needs to be on a port that isn't being used (the current apps are running on port 5006, the default port for Bokeh). For example.
-    ```
-    bokeh serve D:\CommonGitRepos\Bokeh\reeds-pivot --show --port 5007
-    ```
+1. If the window becomes unresponsive, simply refresh the page (you may want to export config first).
+1. If a page refresh doesn't work, then restart the bokeh server. If you have time, you can send Matt a screenshot of the error in the terminal window, if there is one.
+
+## Modifying App Code
+* On local, modify the code at will. You may want to create a git branch for you modifications.
+* On Orion, please create a copy of D:\\CommonGitRepos\\Bokeh\\reeds-pivot and make modifications to that copy so that you don't effect others.
+
+ ## Resources
+This tool uses bokeh, built on python:
+http://bokeh.pydata.org/en/latest/.
+The site has good documentation in the User Guide and Reference.
+
+There is also an active google group for issues:
+https://groups.google.com/a/continuum.io/forum/#!forum/bokeh
+
+And of course, python has good documentation too:
+https://docs.python.org/2.7/tutorial/
+https://docs.python.org/3.5/tutorial/
