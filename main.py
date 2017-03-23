@@ -957,7 +957,6 @@ def get_data_and_build():
 def update_adv_col(attr, old, new):
     if wdg['adv_col'].value != 'None':
         wdg['adv_col_base'].options = ['None'] + ADV_BASES + [str(i) for i in sorted(df[wdg['adv_col'].value].unique().tolist())]
-        update_plots()
 
 def update_presets(attr, old, new):
     if wdg['presets'].value != 'None':
