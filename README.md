@@ -8,17 +8,21 @@ The core of this tool is the same as for the csv pivot tool: https://github.com/
 There are two different ways to use this app: On Orion (easiest way), and locally. See the following sections for details on each.
 
 ## Running on Orion (easiest)
-1. Simply double click the *Launch Super Pivot.bat* file on your desktop on Orion. This will launch the bokeh server and a browser window with tabs for both *superpivot* (CSV/GDX viewer app) and *reeds-pivot* (this app).
-    * If you're curious, you can open the .bat file in a text editor. The command will look like:
+1. Simply double click the *Launch Super Pivot.bat* file on your desktop on Orion. This will launch the bokeh server in a terminal window and a browser window with tabs for both *superpivot* (CSV/GDX viewer app) and *reeds-pivot* (this app).
+    * If you're curious, you can open the .bat file in a text editor. The contents will look like:
       ```
-      bokeh serve D:\CommonGitRepos\Bokeh\reeds-pivot D:\CommonGitRepos\Bokeh\superpivot --show --port <your_port_num>
+      start bokeh serve D:\CommonGitRepos\Bokeh\reeds-pivot D:\CommonGitRepos\Bokeh\superpivot   --host 1wp11rdori01.nrel.gov:<port> --host localhost:<port> --port  <port> 
+      explorer http://1wp11rdori01.nrel.gov:<port>/superpivot 
+      explorer http://1wp11rdori01.nrel.gov:<port>/reeds-pivot
       ```
-    * Here is a breakdown of the above command:
+    * Here is a breakdown of the contents of *Launch Super Pivot.bat*:
         * `bokeh serve`: Launch bokeh server. See http://bokeh.pydata.org/en/latest/docs/user_guide/server.html for more info.
         * `D:\CommonGitRepos\Bokeh\reeds-pivot D:\CommonGitRepos\Bokeh\superpivot`: Paths to bokeh apps that we are running. Note that these apps will be updated frequently. If you want to manage your own copies, simply copy these apps and enter the new paths instead.
-        * `--show`: Open browser
-        * `--port <your_port_num>`: Jonathan has assigned you a unique port on Orion to run your bokeh server. We can't all use the same port number because each port can only be used once.
+        * `--host 1wp11rdori01.nrel.gov:<port> --host localhost:<port>`: The first host allows requests that are external to Orion (but on the NREL network) to access this bokeh server. The Second allows internal requests to localhost.
+        * `--port <port>`: Jonathan has assigned you a unique port on Orion to run your bokeh server. We can't all use the same port number because each port can only be used once.
+        * `explorer ...`: These two statements open browser windows for reeds-pivot and superpivot.
 1. Go to the *Loading ReEDS data* section below.
+1. When done, simply close the terminal window that is running the server.
 
 ## Running Locally
 1. Follow instructions to install Anaconda for Python 2.7 and Bokeh: https://github.com/mmowers/superpivot#setting-up-from-scratch-if-you-dont-already-have-bokeh
@@ -56,7 +60,7 @@ After data is fetched for a given set of runs, a set of dropdowns will appear on
     * Generation Fraction: Select *Generation* as *Result*, and select *Stacked Gen* under *Presets*. Then, under *Comparisons*, select *Operation*=*Ratio*, *Operate Across*=*tech*, and *Base*=*Total*.
     * Capacity Differences, solve-year-to-solve-year: Select *Capacity* as *Result*, and select *Stacked Capacity* under *Presets*. Then, under *Comparisons*, select *Operation*=*Difference*, *Operate Across*=*year*, and *Base*=*Consecutive*.
 1. *Download*: Download any data you're viewing with the *Download View* button, or download all data for a given result with the *Download Full Result* button. It will be downloaded into a timestamped file in the *downloads\\* folder. Note that if you're on Orion, the folder is in *D:\\CommonGitRepos\\Bokeh\\reeds-pivot*
-1. *Export Config to URL*: Save any widget configuration for later use with this button, and copy the resulting URL from the address bar. At a later time, you will be able to load the same view by simply visiting that URL (with your bokeh server running). On Orion, you may also send the URL to someone else to view. Currently you cannot use the same URL on different machines because the paths to files in the *Meta* section are different (work in progress).
+1. *Export Config to URL*: Save any widget configuration for later use with this button, and copy the resulting URL from the address bar. At a later time, you will be able to load the same view by simply visiting that URL (with your bokeh server running). If the URL is from Orion, you may access the URL from any computer connected to the NREL network (while the bokeh server on Orion is still running). Currently you cannot use the same URL on different machines that are running different bokeh servers because the paths to files in the *Meta* section are different (work in progress).
 
 ## Pro tips
 1. Pressing *Alt* will collapse all expandable sections.
