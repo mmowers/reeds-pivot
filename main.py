@@ -96,6 +96,20 @@ results_meta = collections.OrderedDict((
         )),
         }
     ),
+    ('New Capacity (GW)',
+        {'file': 'CONVqn.gdx',
+        'param': 'CONVqn_newallyears',
+        'columns': ['tech', 'n', 'year', 'Capacity (GW)'],
+        'preprocess': [
+            {'func': scale_column, 'args': {'scale_factor': .001, 'column': 'Capacity (GW)'}},
+            {'func': scale_column_filtered, 'args': {'by_column': 'tech', 'by_vals': ['UPV', 'DUPV', 'distPV'], 'change_column': 'Capacity (GW)', 'scale_factor': 1/1.1}},
+        ],
+        'presets': collections.OrderedDict((
+            ('Stacked Capacity',{'x':'year','y':'Capacity (GW)', 'y_agg':'Sum','series':'tech', 'explode': 'scenario','chart_type':'Bar', 'bar_width':'1.5'}),
+            ('Tech Compare',{'x':'year','y':'Capacity (GW)', 'y_agg':'Sum','series':'scenario', 'explode': 'tech','chart_type':'Line'}),
+        )),
+        }
+    ),
     ('Generation (TWh)',
         {'file': 'CONVqn.gdx',
         'param': 'CONVqmnallyears',
