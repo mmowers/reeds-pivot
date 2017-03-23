@@ -1,7 +1,6 @@
 from __future__ import division
 import os
 import os.path
-import gdxl
 import math
 import json
 import numpy as np
@@ -16,6 +15,7 @@ import bokeh.models.tools as bmt
 import bokeh.plotting as bp
 import datetime
 import six.moves.urllib.parse as urlp
+import gdxl
 
 PLOT_WIDTH = 300
 PLOT_HEIGHT = 300
