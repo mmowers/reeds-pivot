@@ -80,6 +80,15 @@ def pre_elec_price(df, **kw):
     df.rename(columns={'t1': 'load', 't3': 'Reg Price (2015$/MWh)', 't17': 'Comp Price (2015$/MWh)'}, inplace=True)
     return df
 
+def add_huc_reg(df, **kw):
+    # import pdb; pdb.set_trace()
+    huc_map = pd.read_csv(this_dir_path + '/csv/huc_2_ratios.csv')
+    df = pd.merge(left=df, right=huc_map, how='outer', on='n', sort=False)
+    df['value'] = df['value'] * df['pca_huc_ratio']
+    df = df.drop('pca_huc_ratio', 1)
+    df = df.drop('huc_pca_ratio', 1)
+    return df
+
 #Results metadata
 results_meta = collections.OrderedDict((
     ('Capacity (GW)',
@@ -169,27 +178,29 @@ results_meta = collections.OrderedDict((
         )),
         }
     ),
-    ('Water Withdrawals',
+    ('Water Withdrawals (Bil Gals)',
         {'file': "water_output.gdx",
         'param': 'WaterWqctnallyears',
-        'columns': ["tech", "cool_tech", "n", "year", "Withdrawals (Bil Gallons)"],
+        'columns': ["tech", "cool_tech", "n", "year", "value"],
         'preprocess': [
-            {'func': scale_column, 'args': {'scale_factor': 0.001, 'column': 'Withdrawals (Bil Gallons)'}},
+            {'func': scale_column, 'args': {'scale_factor': 0.001, 'column': 'value'}},
+            {'func': add_huc_reg, 'args': {}},
         ],
         'presets': collections.OrderedDict((
-            ('National',{'x':'year','y':'Withdrawals (Bil Gallons)', 'y_agg':'Sum', 'series':'scenario', 'chart_type':'Line'}),
+            ('National',{'x':'year','y':'value', 'y_agg':'Sum', 'series':'scenario', 'chart_type':'Line'}),
         )),
         }
     ),
-    ('Water Consumption',
+    ('Water Consumption (Bil Gals)',
         {'file': "water_output.gdx",
         'param': 'WaterCqctnallyears',
-        'columns': ["tech", "cool_tech", "n", "year", "Consumption (Bil Gallons)"],
+        'columns': ["tech", "cool_tech", "n", "year", "value"],
         'preprocess': [
-            {'func': scale_column, 'args': {'scale_factor': 0.001, 'column': 'Consumption (Bil Gallons)'}},
+            {'func': scale_column, 'args': {'scale_factor': 0.001, 'column': 'value'}},
+            {'func': add_huc_reg, 'args': {}},
         ],
         'presets': collections.OrderedDict((
-            ('National',{'x':'year','y':'Consumption (Bil Gallons)', 'y_agg':'Sum', 'series':'scenario', 'chart_type':'Line'}),
+            ('National',{'x':'year','y':'value', 'y_agg':'Sum', 'series':'scenario', 'chart_type':'Line'}),
         )),
         }
     ),
@@ -404,6 +415,11 @@ columns_meta = {
     'n':{
         'type': 'string',
         'join': this_dir_path + '/csv/hierarchy.csv',
+    },
+    'huc_2':{
+        'type': 'string',
+        'filterable': True,
+        'seriesable': True,
     },
     'year':{
         'type': 'number',
