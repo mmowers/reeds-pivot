@@ -80,6 +80,14 @@ def pre_elec_price(df, **kw):
     df.rename(columns={'t1': 'load', 't3': 'Reg Price (2015$/MWh)', 't17': 'Comp Price (2015$/MWh)'}, inplace=True)
     return df
 
+def pre_elec_price_components(dfs, **kw):
+    df_load = dfs['load'][dfs['load']['type'] == 'reqt']
+    df_load = df_load.drop('type', 1)
+    df_main = dfs['main']
+    df_main['value'] = df_main['value'] * inflation_mult
+    df = pd.merge(left=df_main, right=df_load, how='inner', on=['n','year'], sort=False)
+    return df
+
 def add_huc_reg(df, **kw):
     huc_map = pd.read_csv(this_dir_path + '/csv/huc_2_ratios.csv')
     df = pd.merge(left=df, right=huc_map, how='outer', on='n', sort=False)
@@ -174,6 +182,20 @@ results_meta = collections.OrderedDict((
             ('Census Competitive',{'x':'year','y':'Comp Price (2015$/MWh)', 'y_agg':'Weighted Ave', 'y_weight':'load', 'series':'scenario', 'explode': 'censusregions', 'chart_type':'Line'}),
             ('National Regulated',{'x':'year','y':'Reg Price (2015$/MWh)', 'y_agg':'Weighted Ave', 'y_weight':'load', 'series':'scenario', 'explode': 'None', 'chart_type':'Line'}),
             ('Census Regulated',{'x':'year','y':'Reg Price (2015$/MWh)', 'y_agg':'Weighted Ave', 'y_weight':'load', 'series':'scenario', 'explode': 'censusregions', 'chart_type':'Line'}),
+        )),
+        }
+    ),
+    ('Elec Price Components',
+        {'sources': [
+            {'name': 'load', 'file': 'CONVqn.gdx', 'param': 'CONVqmnallyears', 'columns': ['type', 'n', 'year', 'load']},
+            {'name': 'main', 'file': 'MarginalPrices.gdx', 'param': 'wpmarg_BA_ann_allyrs', 'columns': ['n', 'elec_comp_type','year', 'value']},
+        ],
+        'preprocess': [
+            {'func': pre_elec_price_components, 'args': {}},
+        ],
+        'presets': collections.OrderedDict((
+            ('Stacked Components',{'x':'year','y':'value', 'y_agg':'Weighted Ave', 'y_weight':'load', 'series':'elec_comp_type', 'explode': 'scenario', 'chart_type':'Bar'}),
+            ('Scenario Compare',{'x':'year','y':'value', 'y_agg':'Weighted Ave', 'y_weight':'load', 'series':'scenario', 'explode': 'elec_comp_type', 'chart_type':'Line'}),
         )),
         }
     ),
