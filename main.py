@@ -81,7 +81,6 @@ def pre_elec_price(df, **kw):
     return df
 
 def add_huc_reg(df, **kw):
-    # import pdb; pdb.set_trace()
     huc_map = pd.read_csv(this_dir_path + '/csv/huc_2_ratios.csv')
     df = pd.merge(left=df, right=huc_map, how='outer', on='n', sort=False)
     df['value'] = df['value'] * df['pca_huc_ratio']
