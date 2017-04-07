@@ -527,8 +527,18 @@ def get_data():
         scenario_name = scenarios[i]['name']
         if scenario_name not in cur_scenarios:
             #get the gdx result and preprocess
-            df_scen_result = gdxl.get_df(scenarios[i]['path'] + '\\gdxfiles\\' + result_meta['file'], result_meta['param'])
-            df_scen_result.columns = result_meta['columns']
+            if 'sources' in result_meta:
+                #If we have multiple parameters as data sources, we must gather them all, and the first preprocess
+                #function (which is necessary) will accept a dict of dataframes and return a combined dataframe.
+                df_scen_result = {}
+                for src in result_meta['sources']:
+                    df_src = gdxl.get_df(scenarios[i]['path'] + '\\gdxfiles\\' + src['file'], src['param'])
+                    df_src.columns = src['columns']
+                    df_scen_result[src['name']] = df_src
+            else:
+                #else we have only one parameter as a data source
+                df_scen_result = gdxl.get_df(scenarios[i]['path'] + '\\gdxfiles\\' + result_meta['file'], result_meta['param'])
+                df_scen_result.columns = result_meta['columns']
             if 'preprocess' in result_meta:
                 for preprocess in result_meta['preprocess']:
                     df_scen_result = preprocess['func'](df_scen_result, **preprocess['args'])
