@@ -439,8 +439,18 @@ columns_meta = {
     },
     'huc_2':{
         'type': 'string',
-        'filterable': True,
-        'seriesable': True,
+    },
+    'huc_4':{
+        'type': 'string',
+        'join': this_dir_path + '/csv/huc_join.csv',
+    },
+    'huc_6':{
+        'type': 'string',
+        'join': this_dir_path + '/csv/huc_join.csv',
+    },
+    'huc_8':{
+        'type': 'string',
+        'join': this_dir_path + '/csv/huc_join.csv',
     },
     'year':{
         'type': 'number',
