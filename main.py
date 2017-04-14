@@ -609,8 +609,11 @@ def process_data():
 
     columns = df.columns.values.tolist()
     for c in columns:
-        if c in columns_meta and columns_meta[c]['type'] is 'number':
-            df[c] = pd.to_numeric(df[c], errors='coerce')
+        if c in columns_meta:
+            if columns_meta[c]['type'] is 'number':
+                df[c] = pd.to_numeric(df[c], errors='coerce')
+            elif columns_meta[c]['type'] is 'string':
+                df[c] = df[c].astype(str)
     discrete = [x for x in columns if df[x].dtype == object]
     continuous = [x for x in columns if x not in discrete]
     filterable = discrete+[x for x in continuous if x in columns_meta and columns_meta[x]['filterable']]
