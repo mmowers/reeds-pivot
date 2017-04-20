@@ -439,6 +439,7 @@ columns_meta = {
     },
     'huc_2':{
         'type': 'string',
+        'join': this_dir_path + '/csv/huc_join.csv',
     },
     'huc_4':{
         'type': 'string',
